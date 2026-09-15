@@ -52,18 +52,18 @@ export function Sidebar({ onNavigate }: SidebarProps) {
   return (
     <aside className="flex h-full w-60 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
       <div className="flex h-14 shrink-0 items-center gap-3 border-b border-sidebar-border px-4">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-info shadow-sm">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-primary to-info shadow-xs ring-1 ring-primary/20">
           <Zap className="h-[18px] w-[18px] fill-white text-white" />
         </div>
         <div className="min-w-0">
           <p className="truncate text-sm font-bold tracking-tight text-foreground">Interview Memo</p>
-          <p className="text-[11px] text-muted-foreground">求职面试 OS</p>
+          <p className="text-[11px] font-medium text-muted-foreground/80">求职面试 OS</p>
         </div>
       </div>
       <nav className="scrollbar-thin flex-1 space-y-4 overflow-y-auto px-3 py-4">
         {navGroups.map((group) => (
           <div key={group.label}>
-            <p className="mb-1.5 px-3 text-[11px] font-medium tracking-wider text-muted-foreground/80">
+            <p className="mb-1.5 px-3 text-[10px] font-semibold tracking-wider uppercase text-muted-foreground/70">
               {group.label}
             </p>
             <div className="space-y-0.5">
@@ -75,19 +75,19 @@ export function Sidebar({ onNavigate }: SidebarProps) {
                   onClick={onNavigate}
                   className={({ isActive }) =>
                     cn(
-                      'relative flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
+                      'relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150',
                       isActive
-                        ? 'bg-primary/10 font-medium text-primary'
-                        : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                        ? 'bg-primary/10 text-primary shadow-[0_1px_2px_rgba(0,0,0,0.02)]'
+                        : 'text-sidebar-foreground hover:bg-sidebar-accent/80 hover:text-foreground',
                     )
                   }
                 >
                   {({ isActive }) => (
                     <>
-                      <Icon className="h-4 w-4 shrink-0" />
-                      {label}
+                      <Icon className={cn('h-4 w-4 shrink-0 transition-colors', isActive ? 'text-primary' : 'text-muted-foreground/80')} />
+                      <span>{label}</span>
                       {isActive && (
-                        <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-primary" />
+                        <span className="absolute left-1 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full bg-primary" />
                       )}
                     </>
                   )}
@@ -104,19 +104,19 @@ export function Sidebar({ onNavigate }: SidebarProps) {
           onClick={onNavigate}
           className={({ isActive }) =>
             cn(
-              'relative flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
+              'relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150',
               isActive
-                ? 'bg-primary/10 font-medium text-primary'
-                : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                ? 'bg-primary/10 text-primary shadow-[0_1px_2px_rgba(0,0,0,0.02)]'
+                : 'text-sidebar-foreground hover:bg-sidebar-accent/80 hover:text-foreground',
             )
           }
         >
           {({ isActive }) => (
             <>
-              <Settings className="h-4 w-4 shrink-0" />
-              设置
+              <Settings className={cn('h-4 w-4 shrink-0 transition-colors', isActive ? 'text-primary' : 'text-muted-foreground/80')} />
+              <span>设置</span>
               {isActive && (
-                <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-primary" />
+                <span className="absolute left-1 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full bg-primary" />
               )}
             </>
           )}

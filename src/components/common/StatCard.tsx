@@ -4,13 +4,37 @@ import type { LucideIcon } from 'lucide-react'
 
 type StatTone = 'primary' | 'info' | 'success' | 'warning' | 'destructive' | 'muted'
 
-const TONE_STYLES: Record<StatTone, string> = {
-  primary: 'bg-primary/10 text-primary',
-  info: 'bg-info/10 text-info',
-  success: 'bg-success/10 text-success',
-  warning: 'bg-warning/10 text-warning',
-  destructive: 'bg-destructive/10 text-destructive',
-  muted: 'bg-muted text-muted-foreground',
+const TONE_STYLES: Record<StatTone, { icon: string; border: string; glow: string }> = {
+  primary: {
+    icon: 'bg-primary/10 text-primary border-primary/20',
+    border: 'hover:border-primary/40',
+    glow: 'from-primary/[0.04]',
+  },
+  info: {
+    icon: 'bg-info/10 text-info border-info/20',
+    border: 'hover:border-info/40',
+    glow: 'from-info/[0.04]',
+  },
+  success: {
+    icon: 'bg-success/10 text-success border-success/20',
+    border: 'hover:border-success/40',
+    glow: 'from-success/[0.04]',
+  },
+  warning: {
+    icon: 'bg-warning/10 text-warning border-warning/20',
+    border: 'hover:border-warning/40',
+    glow: 'from-warning/[0.04]',
+  },
+  destructive: {
+    icon: 'bg-destructive/10 text-destructive border-destructive/20',
+    border: 'hover:border-destructive/40',
+    glow: 'from-destructive/[0.04]',
+  },
+  muted: {
+    icon: 'bg-muted text-muted-foreground border-border',
+    border: 'hover:border-border',
+    glow: 'from-muted/[0.1]',
+  },
 }
 
 interface StatCardProps {
@@ -22,17 +46,23 @@ interface StatCardProps {
 }
 
 export function StatCard({ label, value, icon: Icon, tone = 'primary', className }: StatCardProps) {
+  const currentTone = TONE_STYLES[tone]
   return (
     <Card
-      className={cn('transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md', className)}
+      className={cn(
+        'group relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:scale-[0.99]',
+        currentTone.border,
+        className,
+      )}
     >
+      <div className={cn('pointer-events-none absolute inset-0 bg-gradient-to-br to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100', currentTone.glow)} />
       <CardContent className="flex items-center justify-between gap-3 p-5">
         <div className="min-w-0">
-          <p className="truncate text-sm text-muted-foreground">{label}</p>
-          <p className="mt-1 text-3xl font-semibold tracking-tight tabular-nums">{value}</p>
+          <p className="truncate text-xs font-medium tracking-wide uppercase text-muted-foreground">{label}</p>
+          <p className="mt-1 text-3xl font-bold tracking-tight tabular-nums text-foreground">{value}</p>
         </div>
         {Icon && (
-          <div className={cn('shrink-0 rounded-xl p-2.5', TONE_STYLES[tone])}>
+          <div className={cn('shrink-0 rounded-xl border p-2.5 transition-transform duration-200 group-hover:scale-105', currentTone.icon)}>
             <Icon className="h-5 w-5" />
           </div>
         )}
@@ -40,3 +70,4 @@ export function StatCard({ label, value, icon: Icon, tone = 'primary', className
     </Card>
   )
 }
+

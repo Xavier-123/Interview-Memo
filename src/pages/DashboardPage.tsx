@@ -104,27 +104,27 @@ export function DashboardPage() {
                   <div
                     key={interview.id}
                     className={cn(
-                      'flex flex-col gap-3 rounded-lg border p-4 transition-shadow hover:shadow-sm sm:flex-row sm:items-center sm:justify-between',
+                      'flex flex-col gap-3 rounded-xl border border-border/60 bg-card/60 p-4 transition-all hover:border-border hover:bg-accent/20 hover:shadow-xs sm:flex-row sm:items-center sm:justify-between',
                       urgencyCardClass(interview.scheduledAt, interview.status),
                     )}
                   >
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="font-medium">{interview.company?.name}</p>
+                        <p className="text-sm font-semibold text-foreground">{interview.company?.name}</p>
                         <UpcomingIndicator scheduledAt={interview.scheduledAt} status={interview.status} />
                       </div>
-                      <p className="text-sm text-muted-foreground">{interview.job?.title}</p>
-                      <p className="mt-1 text-sm">
-                        {interview.round} · {formatDateTime(interview.scheduledAt)}
+                      <p className="mt-0.5 text-xs text-muted-foreground">{interview.job?.title}</p>
+                      <p className="mt-1.5 text-xs text-muted-foreground">
+                        <span className="font-medium text-foreground/85">{interview.round}</span> · {formatDateTime(interview.scheduledAt)}
                       </p>
                       <div className="mt-2 flex flex-wrap items-center gap-2">
                         <StatusBadge status={interview.status} />
                         {interview.interviewer && (
-                          <span className="text-xs text-muted-foreground">面试官：{interview.interviewer}</span>
+                          <span className="text-[11px] text-muted-foreground/80">面试官：{interview.interviewer}</span>
                         )}
                       </div>
                     </div>
-                    <Button variant="outline" size="sm" asChild>
+                    <Button variant="outline" size="sm" className="rounded-lg font-normal hover:border-primary/40" asChild>
                       <Link to={`/interviews/${interview.id}`}>查看详情</Link>
                     </Button>
                   </div>
@@ -188,28 +188,28 @@ export function DashboardPage() {
                     <div key={label}>
                       <p
                         className={cn(
-                          'mb-2 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide',
-                          highlightGroup ? 'text-foreground' : 'text-muted-foreground',
+                          'mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider',
+                          highlightGroup ? 'text-foreground' : 'text-muted-foreground/80',
                         )}
                       >
                         {label}
                       </p>
-                      <div className="space-y-3">
+                      <div className="space-y-2.5">
                         {items.map((i) => (
                           <Link
                             key={i.id}
                             to={`/interviews/${i.id}`}
                             className={cn(
-                              'block rounded-lg border p-3 transition-colors hover:border-primary/50 hover:bg-accent/50',
+                              'group block rounded-xl border border-border/60 bg-card/60 p-3.5 transition-all hover:border-primary/40 hover:bg-accent/30 hover:shadow-xs',
                               urgencyCardClass(i.scheduledAt, i.status),
                             )}
                           >
                             <div className="flex items-center justify-between gap-2">
-                              <p className="text-sm font-medium tabular-nums">{formatTime(i.scheduledAt)}</p>
+                              <p className="text-sm font-semibold tabular-nums tracking-tight text-foreground">{formatTime(i.scheduledAt)}</p>
                               <UpcomingIndicator scheduledAt={i.scheduledAt} status={i.status} compact />
                             </div>
-                            <p className="text-sm">{i.company?.name} · {i.job?.title}</p>
-                            <p className="text-xs text-muted-foreground">{i.round}</p>
+                            <p className="mt-1 text-sm font-medium text-foreground/90">{i.company?.name} · {i.job?.title}</p>
+                            <p className="mt-0.5 text-xs text-muted-foreground">{i.round}</p>
                           </Link>
                         ))}
                       </div>
@@ -227,11 +227,11 @@ export function DashboardPage() {
                 学习重点
                 {reviewDueCount > 0 && (
                   <Link to="/knowledge?due=1">
-                    <Badge variant="destructive">待复习 {reviewDueCount}</Badge>
+                    <Badge variant="destructive" className="rounded-full px-2 text-[11px]">待复习 {reviewDueCount}</Badge>
                   </Link>
                 )}
               </CardTitle>
-              <Button variant="ghost" size="sm" asChild>
+              <Button variant="ghost" size="sm" className="rounded-lg text-muted-foreground hover:text-foreground" asChild>
                 <Link to="/insights">分析页</Link>
               </Button>
             </CardHeader>
@@ -243,10 +243,10 @@ export function DashboardPage() {
                   <Link
                     key={p.knowledgeId ?? p.title}
                     to={p.knowledgeId ? `/knowledge?focus=${p.knowledgeId}` : '/insights'}
-                    className="flex items-center justify-between rounded-md border px-3 py-2 text-sm transition-colors hover:bg-accent/50"
+                    className="flex items-center justify-between rounded-lg border border-border/40 bg-muted/20 px-3 py-2 text-sm transition-all hover:border-border hover:bg-accent/40"
                   >
-                    <span className="truncate">{p.title}</span>
-                    <Badge variant="outline" className={cn('gap-1.5', MASTERY_META[p.mastery].color)}>
+                    <span className="truncate font-medium text-foreground/90">{p.title}</span>
+                    <Badge variant="outline" className={cn('gap-1.5 rounded-full border-border/60 font-normal', MASTERY_META[p.mastery].color)}>
                       <span className={cn('h-1.5 w-1.5 rounded-full', MASTERY_META[p.mastery].dot)} />
                       {MASTERY_META[p.mastery].label}
                     </Badge>

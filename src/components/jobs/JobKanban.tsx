@@ -58,19 +58,19 @@ function SortableJobCard({ job, companyName, onEdit, onDelete }: JobCardProps) {
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <Card
         className={cn(
-          'cursor-grab transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:cursor-grabbing',
-          isDragging && 'opacity-50',
+          'cursor-grab border-border/70 transition-all duration-200 hover:-translate-y-0.5 hover:border-border hover:shadow-md active:cursor-grabbing',
+          isDragging && 'opacity-40',
         )}
       >
-        <CardContent className="p-3">
-          <div className="mb-2 flex items-start justify-between gap-2">
-            <p className="flex min-w-0 items-center gap-1 text-xs font-medium text-muted-foreground">
-              <Building2 className="h-3 w-3 shrink-0" />
+        <CardContent className="p-3.5">
+          <div className="mb-1.5 flex items-start justify-between gap-2">
+            <p className="flex min-w-0 items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <Building2 className="h-3 w-3 shrink-0 text-muted-foreground/70" />
               <span className="truncate">{companyName}</span>
             </p>
             <DropdownMenu>
               <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                <Button variant="ghost" size="icon" className="h-6 w-6" onPointerDown={(e) => e.stopPropagation()}>
+                <Button variant="ghost" size="icon" className="h-6 w-6 rounded-md text-muted-foreground hover:text-foreground" onPointerDown={(e) => e.stopPropagation()}>
                   <MoreHorizontal className="h-3.5 w-3.5" />
                 </Button>
               </DropdownMenuTrigger>
@@ -87,50 +87,58 @@ function SortableJobCard({ job, companyName, onEdit, onDelete }: JobCardProps) {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <p className="text-sm font-medium leading-snug">
+          <p className="text-sm font-semibold leading-snug text-foreground">
             <Link
               to={`/jobs/${job.id}`}
-              className="hover:text-primary hover:underline"
+              className="transition-colors hover:text-primary"
               onClick={(e) => e.stopPropagation()}
               onPointerDown={(e) => e.stopPropagation()}
             >
               {job.title}
             </Link>
           </p>
-          <Badge
-            variant="outline"
-            className={cn(
-              'mt-2 gap-1 text-xs font-normal',
-              job.resumeVersionId ? 'text-muted-foreground' : 'border-destructive/40 text-destructive',
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            {job.location && (
+              <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3 shrink-0 text-muted-foreground/70" />{job.location}</span>
             )}
-          >
-            {formatResumeVersionLabel(resumeState, job.resumeVersionId)}
-          </Badge>
-          <div className="mt-2 space-y-1 text-xs text-muted-foreground">
-            <p className="flex items-center gap-1"><MapPin className="h-3 w-3" />{job.location}</p>
-            <p className="flex items-center gap-1"><Banknote className="h-3 w-3" />{job.salaryText}</p>
+            {job.salaryText && (
+              <span className="inline-flex items-center gap-1 font-medium text-foreground/80"><Banknote className="h-3 w-3 shrink-0 text-muted-foreground/70" />{job.salaryText}</span>
+            )}
           </div>
           {nextInterview && (
             <div
               className={cn(
-                'mt-2 rounded-md bg-accent/50 px-2 py-1 text-xs',
+                'mt-2.5 rounded-lg border border-border/40 p-2 text-xs transition-colors',
                 urgencyCardClass(nextInterview.scheduledAt, nextInterview.status),
               )}
             >
-              <div className="flex items-center justify-between gap-2">
-                <p>下一轮：{nextInterview.round}</p>
+              <div className="flex items-center justify-between gap-1.5">
+                <p className="font-medium text-foreground">下一轮：{nextInterview.round}</p>
                 <UpcomingIndicator scheduledAt={nextInterview.scheduledAt} status={nextInterview.status} compact />
               </div>
-              <p className="text-muted-foreground">{formatDateTime(nextInterview.scheduledAt)}</p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">{formatDateTime(nextInterview.scheduledAt)}</p>
             </div>
           )}
-          {job.tags.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1">
-              {job.tags.slice(0, 3).map((t) => (
-                <Badge key={t} variant="secondary" className="text-xs font-normal text-muted-foreground">#{t}</Badge>
-              ))}
-            </div>
-          )}
+          <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+            <span
+              className={cn(
+                'inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-normal transition-colors',
+                job.resumeVersionId
+                  ? 'bg-muted/60 text-muted-foreground'
+                  : 'border border-destructive/25 bg-destructive/10 text-destructive',
+              )}
+            >
+              {formatResumeVersionLabel(resumeState, job.resumeVersionId)}
+            </span>
+            {job.tags.slice(0, 2).map((t) => (
+              <span key={t} className="rounded-md bg-muted/40 px-1.5 py-0.5 text-[11px] font-normal text-muted-foreground">
+                #{t}
+              </span>
+            ))}
+            {job.tags.length > 2 && (
+              <span className="text-[10px] text-muted-foreground/70">+{job.tags.length - 2}</span>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
@@ -139,10 +147,10 @@ function SortableJobCard({ job, companyName, onEdit, onDelete }: JobCardProps) {
 
 function JobCardPreview({ job, companyName }: { job: Job; companyName: string }) {
   return (
-    <Card className="shadow-lg">
-      <CardContent className="p-3">
+    <Card className="w-[260px] shadow-xl ring-1 ring-primary/20">
+      <CardContent className="p-3.5">
         <p className="text-xs text-muted-foreground">{companyName}</p>
-        <p className="text-sm font-medium">{job.title}</p>
+        <p className="mt-0.5 text-sm font-semibold">{job.title}</p>
       </CardContent>
     </Card>
   )
@@ -178,16 +186,13 @@ export function JobKanban({ jobs, onEdit, onDelete, onAdd }: JobKanbanProps) {
     setActiveJob(null)
     const { active, over } = event
     if (!over) return
+    const targetStatus = over.id as JobStatus
+    if (!JOB_STATUS_ORDER.includes(targetStatus)) return
     const jobId = active.id as string
-    const newStatus = over.id as JobStatus
-    const job = jobs.find((j) => j.id === jobId)
-    if (job && job.status !== newStatus && JOB_STATUS_ORDER.includes(newStatus)) {
-      updateJobStatus(jobId, newStatus)
-      toast.success(`已移动到「${JOB_STATUS_LABELS[newStatus]}」`)
-      if (JOB_STATUS_ORDER.indexOf(newStatus) >= JOB_STATUS_ORDER.indexOf('applied') && !job.resumeVersionId) {
-        toast.warning('该岗位尚未关联投递简历，可在编辑岗位时补录')
-      }
-    }
+    const current = jobs.find((j) => j.id === jobId)
+    if (!current || current.status === targetStatus) return
+    updateJobStatus(jobId, targetStatus)
+    toast.success(`已移动到「${JOB_STATUS_LABELS[targetStatus]}」`)
   }
 
   return (
@@ -234,31 +239,37 @@ function KanbanColumn({
     <div
       ref={setNodeRef}
       className={cn(
-        'flex w-[280px] shrink-0 flex-col rounded-lg border bg-muted/30 transition-colors',
-        isOver && 'border-primary/60 bg-accent/30',
+        'flex w-[280px] shrink-0 flex-col rounded-xl border border-border/60 bg-muted/25 transition-all duration-150',
+        isOver && 'border-primary/50 bg-primary/[0.03] shadow-xs',
       )}
     >
-      <div className="flex items-center justify-between border-b px-3 py-2">
+      <div className="flex items-center justify-between border-b border-border/50 px-3.5 py-2.5">
         <div className="flex items-center gap-2">
           <span className={cn('h-2 w-2 shrink-0 rounded-full', JOB_STATUS_META[status].dot)} />
-          <span className="text-sm font-medium">{JOB_STATUS_LABELS[status]}</span>
-          <Badge variant="secondary" className="h-5 px-1.5 text-xs">{jobs.length}</Badge>
+          <span className="text-sm font-semibold tracking-tight">{JOB_STATUS_LABELS[status]}</span>
+          <Badge variant="secondary" className="h-5 rounded-full px-1.5 text-[11px] font-medium text-muted-foreground">{jobs.length}</Badge>
         </div>
-        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground" onClick={onAdd} aria-label="新增岗位">
+        <Button variant="ghost" size="icon" className="h-6 w-6 rounded-md text-muted-foreground hover:text-foreground" onClick={onAdd} aria-label="新增岗位">
           <Plus className="h-3.5 w-3.5" />
         </Button>
       </div>
       <SortableContext items={jobs.map((j) => j.id)} strategy={verticalListSortingStrategy}>
         <div className="flex flex-col gap-2 p-2">
-          {jobs.map((job) => (
-            <SortableJobCard
-              key={job.id}
-              job={job}
-              companyName={getCompanyName(companies, job.companyId)}
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
-          ))}
+          {jobs.length === 0 ? (
+            <div className="flex min-h-[80px] items-center justify-center rounded-lg border border-dashed border-border/40 p-4 text-center text-xs text-muted-foreground/60">
+              拖拽岗位到这里
+            </div>
+          ) : (
+            jobs.map((job) => (
+              <SortableJobCard
+                key={job.id}
+                job={job}
+                companyName={getCompanyName(companies, job.companyId)}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
+            ))
+          )}
         </div>
       </SortableContext>
     </div>

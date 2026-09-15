@@ -34,6 +34,8 @@ interface UrgencyMeta {
   label: string
   /** 卡片容器：左侧色条 + 轻微底色 */
   card: string
+  /** 微胶囊徽章样式 */
+  badge: string
   /** 圆点颜色 */
   dot: string
   /** 文案颜色 */
@@ -45,21 +47,24 @@ interface UrgencyMeta {
 export const URGENCY_META: Record<Urgency, UrgencyMeta> = {
   today: {
     label: '今天',
-    card: 'border-l-2 border-l-primary bg-primary/[0.04] dark:bg-primary/[0.08]',
+    card: 'border-l-[3px] border-l-primary bg-primary/[0.03] dark:bg-primary/[0.06]',
+    badge: 'bg-primary/10 text-primary border border-primary/25',
     dot: 'bg-primary',
     text: 'text-primary',
     live: true,
   },
   tomorrow: {
     label: '明天',
-    card: 'border-l-2 border-l-amber-500 bg-amber-50/60 dark:bg-amber-950/20',
+    card: 'border-l-[3px] border-l-amber-500 bg-amber-500/[0.03] dark:bg-amber-500/[0.06]',
+    badge: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25',
     dot: 'bg-amber-500',
     text: 'text-amber-700 dark:text-amber-400',
     live: false,
   },
   soon: {
     label: '3 天内',
-    card: 'border-l-2 border-l-amber-400/70',
+    card: 'border-l-[3px] border-l-amber-400/80 bg-muted/20',
+    badge: 'bg-muted/80 text-foreground/80 border border-border',
     dot: 'bg-amber-400',
     text: 'text-amber-700 dark:text-amber-400',
     live: false,
@@ -67,6 +72,7 @@ export const URGENCY_META: Record<Urgency, UrgencyMeta> = {
   later: {
     label: '',
     card: '',
+    badge: 'bg-muted/50 text-muted-foreground border border-border/50',
     dot: 'bg-muted-foreground/50',
     text: 'text-muted-foreground',
     live: false,
@@ -74,6 +80,7 @@ export const URGENCY_META: Record<Urgency, UrgencyMeta> = {
   past: {
     label: '',
     card: '',
+    badge: 'bg-muted/40 text-muted-foreground/60 border border-border/40',
     dot: 'bg-muted-foreground/40',
     text: 'text-muted-foreground',
     live: false,

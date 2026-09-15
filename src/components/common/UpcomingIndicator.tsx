@@ -3,21 +3,21 @@ import { getCountdownLabel, getUrgency, isUpcomingSoon, URGENCY_META, type Urgen
 import type { InterviewStatus } from '@/types'
 
 /**
- * 呼吸圆点：今天的面试外圈缓慢扩散（motion-reduce 下静止），其余仅实心点。
+ * 呼吸圆点：今天的面试外圈双层扩散波动（motion-reduce 下静止），其余仅实心点。
  */
 export function LiveDot({ urgency, className }: { urgency: Urgency; className?: string }) {
   const meta = URGENCY_META[urgency]
   return (
-    <span className={cn('relative inline-flex h-2 w-2 shrink-0', className)}>
+    <span className={cn('relative inline-flex h-2.5 w-2.5 shrink-0 items-center justify-center', className)}>
       {meta.live && (
         <span
           className={cn(
-            'absolute inline-flex h-full w-full rounded-full opacity-60 motion-safe:animate-ping motion-reduce:hidden',
+            'absolute inline-flex h-full w-full rounded-full opacity-70 motion-safe:animate-ping motion-reduce:hidden',
             meta.dot,
           )}
         />
       )}
-      <span className={cn('relative inline-flex h-2 w-2 rounded-full', meta.dot)} />
+      <span className={cn('relative inline-flex h-2 w-2 rounded-full ring-2 ring-background', meta.dot)} />
     </span>
   )
 }
@@ -38,9 +38,15 @@ export function UpcomingIndicator({ scheduledAt, status, className, compact }: U
   if (!isUpcomingSoon(urgency)) return null
   const meta = URGENCY_META[urgency]
   return (
-    <span className={cn('inline-flex items-center gap-1.5 text-xs font-medium', meta.text, className)}>
+    <span
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium backdrop-blur-xs transition-colors',
+        meta.badge,
+        className,
+      )}
+    >
       <LiveDot urgency={urgency} />
-      {compact ? meta.label : getCountdownLabel(scheduledAt)}
+      <span>{compact ? meta.label : getCountdownLabel(scheduledAt)}</span>
     </span>
   )
 }

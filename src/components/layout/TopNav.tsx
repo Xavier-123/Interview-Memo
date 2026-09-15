@@ -133,7 +133,7 @@ export function TopNav() {
 
   return (
     <>
-      <header className="flex h-14 items-center gap-4 border-b bg-background px-4 lg:px-6">
+      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b border-border/60 bg-background/80 px-4 backdrop-blur-md transition-colors lg:px-6">
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="lg:hidden">
@@ -148,26 +148,26 @@ export function TopNav() {
         <div className="hidden flex-1 lg:block">
           <Button
             variant="outline"
-            className="h-9 w-full max-w-sm justify-start text-sm font-normal text-muted-foreground shadow-none hover:border-primary/30"
+            className="h-9 w-full max-w-sm justify-start rounded-lg border-border/70 bg-muted/40 text-sm font-normal text-muted-foreground shadow-none transition-all hover:border-primary/40 hover:bg-muted/70 hover:text-foreground"
             onClick={() => setSearchOpen(true)}
           >
             <Search className="mr-2 h-4 w-4 text-muted-foreground/70" />
-            搜索岗位、公司、面试、简历、题库...
-            <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded border bg-muted/80 px-1.5 font-mono text-[10px] font-medium text-muted-foreground sm:flex">
+            <span className="truncate">搜索岗位、公司、面试、简历、题库...</span>
+            <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded border border-border/80 bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground sm:flex">
               Ctrl K
             </kbd>
           </Button>
         </div>
 
         <div className="ml-auto flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSearchOpen(true)}>
+          <Button variant="ghost" size="icon" className="rounded-lg lg:hidden" onClick={() => setSearchOpen(true)}>
             <Search className="h-4 w-4" />
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="sm" className="gap-1">
+              <Button size="sm" className="gap-1.5 rounded-lg shadow-sm transition-all hover:opacity-95 hover:shadow active:scale-[0.98]">
                 <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">新增</span>
+                <span className="hidden font-medium sm:inline">新增</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -178,7 +178,7 @@ export function TopNav() {
               <DropdownMenuItem onClick={() => navigate('/knowledge?new=1')}>新增题目</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="切换主题">
+          <Button variant="ghost" size="icon" className="rounded-lg text-muted-foreground hover:text-foreground" onClick={toggleTheme} aria-label="切换主题">
             {resolvedDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
         </div>
