@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { TagInput } from '@/components/common/TagInput'
+import { DatePicker } from '@/components/ui/date-picker'
 import { useAppStore } from '@/store/useAppStore'
 import { JOB_STATUS_LABELS, JOB_STATUS_ORDER, type Job, type JobStatus, type JobType, type JobPriority } from '@/types'
 import { toast } from 'sonner'
@@ -258,7 +259,7 @@ export function JobFormDialog({ open, onOpenChange, job, defaultStatus = 'applie
             </div>
             <div className="space-y-2">
               <Label>投递日期</Label>
-              <Input type="date" value={appliedAt} onChange={(e) => setAppliedAt(e.target.value)} />
+              <DatePicker value={appliedAt} onChange={setAppliedAt} placeholder="选择投递日期" />
             </div>
           </div>
           <div className="space-y-2">
