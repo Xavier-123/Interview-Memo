@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
+import { CheckCircle2, CircleDashed, NotebookPen } from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { StarRating } from '@/components/common/StarRating'
 import { ErrorState } from '@/components/common/ErrorState'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -99,6 +101,7 @@ export function ReviewPage() {
   return (
     <div>
       <PageHeader
+        icon={NotebookPen}
         title="面试复盘"
         description={`${company?.name} · ${job.title} · ${interview.round} · ${formatDateTime(interview.scheduledAt)}`}
         actions={
@@ -175,19 +178,33 @@ export function ReviewListPage() {
 
   return (
     <div>
-      <PageHeader title="面试复盘" description="结构化复盘，形成学习闭环" />
+      <PageHeader icon={NotebookPen} title="面试复盘" description="结构化复盘，形成学习闭环" />
       <div className="space-y-2">
         {items.map((i) => (
           <Link
             key={i.id}
             to={`/interviews/${i.id}/review`}
-            className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-accent/50"
+            className="flex items-center justify-between gap-3 rounded-lg border p-4 transition-all hover:border-primary/40 hover:bg-accent/30 hover:shadow-sm"
           >
-            <div>
-              <p className="font-medium">{i.company?.name} · {i.job?.title}</p>
+            <div className="min-w-0">
+              <p className="truncate font-medium">{i.company?.name} · {i.job?.title}</p>
               <p className="text-sm text-muted-foreground">{i.round} · {formatDateTime(i.scheduledAt)}</p>
             </div>
-            <span className="text-sm text-muted-foreground">{i.hasReview ? '✅ 已复盘' : '待复盘'}</span>
+            {i.hasReview ? (
+              <Badge
+                variant="outline"
+                className="shrink-0 gap-1 border-emerald-500/30 text-emerald-700 dark:text-emerald-400"
+              >
+                <CheckCircle2 className="h-3 w-3" /> 已复盘
+              </Badge>
+            ) : (
+              <Badge
+                variant="outline"
+                className="shrink-0 gap-1 border-amber-500/30 text-amber-600 dark:text-amber-400"
+              >
+                <CircleDashed className="h-3 w-3" /> 待复盘
+              </Badge>
+            )}
           </Link>
         ))}
       </div>

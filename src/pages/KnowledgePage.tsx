@@ -155,6 +155,7 @@ export function KnowledgePage() {
   return (
     <div>
       <PageHeader
+        icon={BookOpen}
         title="题库 / 知识库"
         description="个人面试题库，追踪掌握程度"
         actions={<Button onClick={openNew}><Plus className="h-4 w-4" /> 新增题目</Button>}
@@ -169,7 +170,7 @@ export function KnowledgePage() {
               onClick={() => setCategory('all')}
               className={cn(
                 'flex w-full items-center justify-between rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent',
-                category === 'all' && 'bg-accent font-medium',
+                category === 'all' ? 'bg-primary/10 font-medium text-primary' : 'hover:text-foreground',
               )}
             >
               全部 <Badge variant="secondary">{knowledge.length}</Badge>
@@ -181,7 +182,7 @@ export function KnowledgePage() {
                   onClick={() => setCategory(cat)}
                   className={cn(
                     'flex w-full items-center justify-between rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent',
-                    category === cat && 'bg-accent font-medium',
+                    category === cat ? 'bg-primary/10 font-medium text-primary' : 'hover:text-foreground',
                   )}
                 >
                   {cat} <Badge variant="secondary">{categoryCounts[cat] ?? 0}</Badge>
@@ -226,7 +227,7 @@ export function KnowledgePage() {
               {filtered.map((k) => (
                 <div
                   key={k.id}
-                  className="flex flex-col gap-2 rounded-lg border p-4 transition-colors hover:border-primary/40 sm:flex-row sm:items-center sm:justify-between"
+                  className="flex flex-col gap-2 rounded-lg border p-4 transition-all hover:border-primary/40 hover:bg-accent/30 hover:shadow-sm sm:flex-row sm:items-center sm:justify-between"
                 >
                   <button type="button" onClick={() => openEdit(k)} className="min-w-0 flex-1 text-left">
                     <div className="flex flex-wrap items-center gap-2">
@@ -240,16 +241,38 @@ export function KnowledgePage() {
                   </button>
                   <div className="flex flex-col items-end gap-2">
                     <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                      <span className={MASTERY_META[k.mastery].color}>
-                        {MASTERY_META[k.mastery].emoji} {MASTERY_META[k.mastery].label}
+                      <span className={cn('flex items-center gap-1.5', MASTERY_META[k.mastery].color)}>
+                        <span className={cn('h-1.5 w-1.5 rounded-full', MASTERY_META[k.mastery].dot)} />
+                        {MASTERY_META[k.mastery].label}
                       </span>
                       <span>出现 {k.appearCount} 次</span>
                       {k.lastSeenAt && <span>最近 {formatDate(k.lastSeenAt)}</span>}
                     </div>
                     <div className="flex flex-wrap gap-1">
-                      <Button variant="outline" size="sm" onClick={() => recordReview(k.id, 'good')}>记住了</Button>
-                      <Button variant="outline" size="sm" onClick={() => recordReview(k.id, 'fair')}>模糊</Button>
-                      <Button variant="outline" size="sm" onClick={() => recordReview(k.id, 'poor')}>忘了</Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-emerald-600 hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+                        onClick={() => recordReview(k.id, 'good')}
+                      >
+                        记住了
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-amber-600 hover:border-amber-500/40 hover:bg-amber-500/10 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300"
+                        onClick={() => recordReview(k.id, 'fair')}
+                      >
+                        模糊
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                        onClick={() => recordReview(k.id, 'poor')}
+                      >
+                        忘了
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -286,9 +309,24 @@ export function KnowledgePage() {
               <Select value={form.mastery} onValueChange={(v) => setForm({ ...form, mastery: v as Mastery })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="good">🟢 熟练</SelectItem>
-                  <SelectItem value="fair">🟡 一般</SelectItem>
-                  <SelectItem value="poor">🔴 不熟</SelectItem>
+                  <SelectItem value="good">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                      熟练
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="fair">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-amber-500" />
+                      一般
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="poor">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-red-500" />
+                      不熟
+                    </span>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -1,7 +1,7 @@
 import { z } from 'zod'
-import type { ExportData, Resume, ResumeVersion } from '@/types'
+import type { ExportData, Job, Resume, ResumeVersion } from '@/types'
 import { createSeedData } from '@/data/seed'
-import { normalizeResume, normalizeResumeProfile, normalizeResumeVersion, normalizeSettings, snapshotResumeProject } from '@/lib/settings'
+import { normalizeJob, normalizeResume, normalizeResumeProfile, normalizeResumeVersion, normalizeSettings, snapshotResumeProject } from '@/lib/settings'
 
 const reminderSchema = z.object({
   enabled: z.boolean(),
@@ -237,6 +237,7 @@ export function validateImportData(data: unknown): ExportData {
     return {
       ...parsed,
       schemaVersion: 2,
+      jobs: parsed.jobs.map((job) => normalizeJob(job as Job)),
       settings: normalizeSettings(parsed.settings),
       resumes,
       resumeVersions,
@@ -258,6 +259,7 @@ export function validateImportData(data: unknown): ExportData {
   }
   return {
     ...parsed,
+    jobs: parsed.jobs.map((job) => normalizeJob(job as Job)),
     resumes: parsed.resumes.map(normalizeResume),
     resumeVersions: parsed.resumeVersions.map((version) => normalizeResumeVersion(version as ResumeVersion)),
     settings: normalizeSettings(parsed.settings),

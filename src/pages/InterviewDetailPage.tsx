@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, BookOpen, Plus, Trash2, Pencil } from 'lucide-react'
+import { ArrowLeft, BookOpen, ClipboardList, Plus, Trash2, Pencil } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { StatusBadge } from '@/components/common/StatusBadge'
@@ -82,6 +82,7 @@ export function InterviewDetailPage() {
       </Button>
 
       <PageHeader
+        icon={ClipboardList}
         title={company?.name ?? ''}
         description={`${job.title} · ${interview.round} · ${formatDateTime(interview.scheduledAt)}`}
         actions={

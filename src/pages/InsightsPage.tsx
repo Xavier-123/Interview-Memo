@@ -1,12 +1,24 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { BarChart3, Copy, Sparkles } from 'lucide-react'
+import {
+  Archive,
+  BarChart3,
+  Building2,
+  Copy,
+  FileQuestion,
+  Flame,
+  Layers,
+  ListOrdered,
+  Sparkles,
+  Star,
+  TrendingDown,
+  TrendingUp,
+} from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Bar,
   BarChart,
   CartesianGrid,
-  Cell,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -15,6 +27,7 @@ import {
   YAxis,
 } from 'recharts'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { ChartTooltip } from '@/components/common/ChartTooltip'
 import { EmptyState } from '@/components/common/EmptyState'
 import { StatCard } from '@/components/common/StatCard'
 import { Button } from '@/components/ui/button'
@@ -36,8 +49,15 @@ import {
 } from '@/store/analytics'
 import { isLlmConfigured, generateLearningAdvice } from '@/lib/llm'
 import { MASTERY_META } from '@/types'
+import { cn } from '@/lib/utils'
 
-const COLORS = ['hsl(232 60% 56%)', 'hsl(160 60% 45%)', 'hsl(45 90% 55%)', 'hsl(280 65% 60%)', 'hsl(0 72% 55%)']
+const AXIS_TICK = { fontSize: 11, fill: 'var(--muted-foreground)' } as const
+
+function weakRateClass(rate: number) {
+  if (rate >= 0.5) return 'text-destructive font-medium'
+  if (rate >= 0.3) return 'text-amber-600 dark:text-amber-400 font-medium'
+  return 'text-muted-foreground'
+}
 
 export function InsightsPage() {
   const updateKnowledge = useAppStore((s) => s.updateKnowledge)
@@ -98,7 +118,7 @@ export function InsightsPage() {
   if (questionCount < 3) {
     return (
       <div>
-        <PageHeader title="分析" description="复盘统计与薄弱项分析" />
+        <PageHeader icon={BarChart3} title="分析" description="复盘统计与薄弱项分析" />
         <EmptyState
           icon={BarChart3}
           title="数据不足"
@@ -112,7 +132,7 @@ export function InsightsPage() {
 
   return (
     <div>
-      <PageHeader title="分析" description="找出高频考点与薄弱项，生成学习重点" />
+      <PageHeader icon={BarChart3} title="分析" description="找出高频考点与薄弱项，生成学习重点" />
 
       <Tabs defaultValue="stats">
         <TabsList>
@@ -122,43 +142,71 @@ export function InsightsPage() {
 
         <TabsContent value="stats" className="space-y-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <StatCard label="记录问题" value={kpis.totalQuestions} />
-            <StatCard label="平均得分" value={kpis.avgRating.toFixed(1)} />
-            <StatCard label="失分率" value={`${Math.round(kpis.weakRate * 100)}%`} />
-            <StatCard label="已归档" value={kpis.archivedCount} />
+            <StatCard label="记录问题" value={kpis.totalQuestions} icon={FileQuestion} tone="primary" />
+            <StatCard label="平均得分" value={kpis.avgRating.toFixed(1)} icon={Star} tone="info" />
+            <StatCard label="失分率" value={`${Math.round(kpis.weakRate * 100)}%`} icon={TrendingDown} tone="destructive" />
+            <StatCard label="已归档" value={kpis.archivedCount} icon={Archive} tone="success" />
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
             <Card>
-              <CardHeader><CardTitle>最容易被问（标签 Top 10）</CardTitle></CardHeader>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Flame className="h-4 w-4 text-primary" />
+                  最容易被问（标签 Top 10）
+                </CardTitle>
+              </CardHeader>
               <CardContent className="h-72">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={topAsked} layout="vertical" margin={{ left: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                    <XAxis type="number" />
-                    <YAxis type="category" dataKey="tag" width={80} tick={{ fontSize: 11 }} />
-                    <Tooltip />
-                    <Bar dataKey="askedCount" radius={[0, 4, 4, 0]}>
-                      {topAsked.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                    </Bar>
+                  <BarChart data={topAsked} layout="vertical" margin={{ left: 4, right: 16 }}>
+                    <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" horizontal={false} />
+                    <XAxis type="number" tick={AXIS_TICK} tickLine={false} axisLine={false} />
+                    <YAxis
+                      type="category"
+                      dataKey="tag"
+                      width={88}
+                      tick={AXIS_TICK}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <Tooltip
+                      content={<ChartTooltip valueFormatter={(v) => `${v} 次`} />}
+                      cursor={{ fill: 'var(--muted)', fillOpacity: 0.5 }}
+                    />
+                    <Bar dataKey="askedCount" fill="var(--chart-1)" radius={[0, 6, 6, 0]} barSize={14} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader><CardTitle>最容易失分（失分率，至少 2 次）</CardTitle></CardHeader>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingDown className="h-4 w-4 text-destructive" />
+                  最容易失分（失分率，至少 2 次）
+                </CardTitle>
+              </CardHeader>
               <CardContent className="h-72">
                 {topWeak.length === 0 ? (
                   <p className="py-12 text-center text-sm text-muted-foreground">暂无足够数据</p>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={topWeak.map((t) => ({ ...t, weakPct: Math.round(t.weakRate * 100) }))} layout="vertical" margin={{ left: 10 }}>
-                      <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                      <XAxis type="number" unit="%" />
-                      <YAxis type="category" dataKey="tag" width={80} tick={{ fontSize: 11 }} />
-                      <Tooltip formatter={(v) => [`${v}%`, '失分率']} />
-                      <Bar dataKey="weakPct" fill="hsl(0 72% 55%)" radius={[0, 4, 4, 0]} />
+                    <BarChart data={topWeak.map((t) => ({ ...t, weakPct: Math.round(t.weakRate * 100) }))} layout="vertical" margin={{ left: 4, right: 16 }}>
+                      <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" horizontal={false} />
+                      <XAxis type="number" unit="%" tick={AXIS_TICK} tickLine={false} axisLine={false} />
+                      <YAxis
+                        type="category"
+                        dataKey="tag"
+                        width={88}
+                        tick={AXIS_TICK}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <Tooltip
+                        content={<ChartTooltip valueFormatter={(v) => `${v}%`} />}
+                        cursor={{ fill: 'var(--muted)', fillOpacity: 0.5 }}
+                      />
+                      <Bar dataKey="weakPct" fill="var(--chart-5)" radius={[0, 6, 6, 0]} barSize={14} />
                     </BarChart>
                   </ResponsiveContainer>
                 )}
@@ -167,18 +215,30 @@ export function InsightsPage() {
           </div>
 
           <Card>
-            <CardHeader><CardTitle>得分趋势</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-primary" />
+                得分趋势
+              </CardTitle>
+            </CardHeader>
             <CardContent className="h-64">
               {ratingTrend.length === 0 ? (
                 <p className="py-8 text-center text-sm text-muted-foreground">暂无趋势数据</p>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={ratingTrend}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-                    <YAxis domain={[1, 5]} />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="avgRating" stroke="hsl(232 60% 56%)" strokeWidth={2} dot />
+                    <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="label" tick={AXIS_TICK} tickLine={false} axisLine={false} />
+                    <YAxis domain={[1, 5]} tick={AXIS_TICK} tickLine={false} axisLine={false} width={32} />
+                    <Tooltip content={<ChartTooltip valueFormatter={(v) => `${v} 分`} />} />
+                    <Line
+                      type="monotone"
+                      dataKey="avgRating"
+                      stroke="var(--chart-1)"
+                      strokeWidth={2}
+                      dot={{ r: 3, fill: 'var(--chart-1)', strokeWidth: 0 }}
+                      activeDot={{ r: 5 }}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               )}
@@ -187,7 +247,12 @@ export function InsightsPage() {
 
           <div className="grid gap-6 lg:grid-cols-2">
             <Card>
-              <CardHeader><CardTitle>按轮次</CardTitle></CardHeader>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-primary" />
+                  按轮次
+                </CardTitle>
+              </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
@@ -202,9 +267,11 @@ export function InsightsPage() {
                     {roundStats.map((r) => (
                       <TableRow key={r.round}>
                         <TableCell>{r.round}</TableCell>
-                        <TableCell>{r.count}</TableCell>
-                        <TableCell>{r.avgRating.toFixed(1)}</TableCell>
-                        <TableCell>{Math.round(r.weakRate * 100)}%</TableCell>
+                        <TableCell className="tabular-nums">{r.count}</TableCell>
+                        <TableCell className="tabular-nums">{r.avgRating.toFixed(1)}</TableCell>
+                        <TableCell className={cn('tabular-nums', weakRateClass(r.weakRate))}>
+                          {Math.round(r.weakRate * 100)}%
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -213,7 +280,12 @@ export function InsightsPage() {
             </Card>
 
             <Card>
-              <CardHeader><CardTitle>按公司</CardTitle></CardHeader>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-primary" />
+                  按公司
+                </CardTitle>
+              </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
@@ -228,9 +300,11 @@ export function InsightsPage() {
                     {companyStats.map((c) => (
                       <TableRow key={c.companyId}>
                         <TableCell>{c.companyName}</TableCell>
-                        <TableCell>{c.count}</TableCell>
-                        <TableCell>{c.avgRating.toFixed(1)}</TableCell>
-                        <TableCell>{Math.round(c.weakRate * 100)}%</TableCell>
+                        <TableCell className="tabular-nums">{c.count}</TableCell>
+                        <TableCell className="tabular-nums">{c.avgRating.toFixed(1)}</TableCell>
+                        <TableCell className={cn('tabular-nums', weakRateClass(c.weakRate))}>
+                          {Math.round(c.weakRate * 100)}%
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -240,16 +314,23 @@ export function InsightsPage() {
           </div>
 
           <Card>
-            <CardHeader><CardTitle>高频题 Top</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ListOrdered className="h-4 w-4 text-primary" />
+                高频题 Top
+              </CardTitle>
+            </CardHeader>
             <CardContent className="space-y-2">
               {knowledgeStats.slice(0, 8).map((k) => (
                 <Link
                   key={k.knowledgeId}
                   to={`/knowledge?focus=${k.knowledgeId}`}
-                  className="flex items-center justify-between rounded-md border p-3 text-sm transition-colors hover:bg-accent/50"
+                  className="flex items-center justify-between rounded-md border p-3 text-sm transition-all hover:border-primary/40 hover:bg-accent/30 hover:shadow-sm"
                 >
-                  <span>{k.title}</span>
-                  <Badge variant="secondary">出现 {k.appearCount} 次 · 均分 {k.avgRating.toFixed(1)}</Badge>
+                  <span className="min-w-0 truncate">{k.title}</span>
+                  <Badge variant="secondary" className="shrink-0 font-normal">
+                    出现 {k.appearCount} 次 · 均分 {k.avgRating.toFixed(1)}
+                  </Badge>
                 </Link>
               ))}
             </CardContent>
@@ -285,8 +366,9 @@ export function InsightsPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="font-medium">{p.title}</p>
-                      <Badge variant="outline" className={MASTERY_META[p.mastery].color}>
-                        {MASTERY_META[p.mastery].emoji} {MASTERY_META[p.mastery].label}
+                      <Badge variant="outline" className={cn('gap-1.5', MASTERY_META[p.mastery].color)}>
+                        <span className={cn('h-1.5 w-1.5 rounded-full', MASTERY_META[p.mastery].dot)} />
+                        {MASTERY_META[p.mastery].label}
                       </Badge>
                     </div>
                     <p className="mt-1 text-sm text-muted-foreground">{p.reason}</p>

@@ -40,9 +40,9 @@ export interface EnrichedInterview extends Interview {
 export function selectKpis(state: AppState): Kpis {
   const jobs = state.jobs
   return {
-    applied: jobs.filter((j) => j.status !== 'wishlist').length,
+    applied: jobs.length,
     interviewing: jobs.filter((j) =>
-      ['screening', 'round1', 'round2', 'hr'].includes(j.status),
+      ['screening', 'written_test', 'round1', 'round2', 'hr'].includes(j.status),
     ).length,
     offer: jobs.filter((j) => j.status === 'offer').length,
     closed: jobs.filter((j) => j.status === 'closed').length,
@@ -51,21 +51,21 @@ export function selectKpis(state: AppState): Kpis {
 
 export function selectFunnel(state: AppState): FunnelItem[] {
   const labels: Record<JobStatus, string> = {
-    wishlist: '待投递',
-    applied: '投递',
-    screening: '简历筛选',
+    applied: '已投递',
+    screening: '简历通过',
+    written_test: '笔试',
     round1: '一面',
     round2: '二面',
     hr: 'HR',
     offer: 'Offer',
     closed: '已结束',
   }
-  const stages: JobStatus[] = ['applied', 'screening', 'round1', 'round2', 'hr', 'offer']
+  const stages: JobStatus[] = ['applied', 'screening', 'written_test', 'round1', 'round2', 'hr', 'offer']
   return stages.map((stage) => ({
     stage,
     label: labels[stage],
     count: state.jobs.filter((j) => {
-      const order = ['wishlist', 'applied', 'screening', 'round1', 'round2', 'hr', 'offer', 'closed']
+      const order = ['applied', 'screening', 'written_test', 'round1', 'round2', 'hr', 'offer', 'closed']
       return order.indexOf(j.status) >= order.indexOf(stage)
     }).length,
   }))
@@ -152,11 +152,11 @@ export function selectJobNextInterview(state: AppState, jobId: string): Intervie
     .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())[0]
 }
 
-export function selectCompanyProgress(state: Pick<AppState, 'jobs'>, companyId: string): JobStatus {
-  const order: JobStatus[] = ['wishlist', 'applied', 'screening', 'round1', 'round2', 'hr', 'offer', 'closed']
+export function selectCompanyProgress(state: Pick<AppState, 'jobs'>, companyId: string): JobStatus | undefined {
+  const order: JobStatus[] = ['applied', 'screening', 'written_test', 'round1', 'round2', 'hr', 'offer', 'closed']
   const jobs = state.jobs.filter((j) => j.companyId === companyId)
-  if (jobs.length === 0) return 'wishlist'
-  return jobs.reduce((max, j) => (order.indexOf(j.status) > order.indexOf(max) ? j.status : max), 'wishlist' as JobStatus)
+  if (jobs.length === 0) return undefined
+  return jobs.reduce((max, j) => (order.indexOf(j.status) > order.indexOf(max) ? j.status : max), 'applied' as JobStatus)
 }
 
 export function selectPoorKnowledge(state: AppState, limit = 5): Knowledge[] {

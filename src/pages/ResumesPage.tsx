@@ -40,7 +40,7 @@ export function ResumesPage() {
   const sorted = useMemo(() => [...resumes].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()), [resumes])
 
   return <div>
-    <PageHeader title="简历" description="维护多套简历与不可变版本" actions={<Button onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4" /> 新建简历</Button>} />
+    <PageHeader icon={FileText} title="简历" description="维护多套简历与不可变版本" actions={<Button onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4" /> 新建简历</Button>} />
     {sorted.length === 0 ? <EmptyState icon={FileText} title="还没有简历" description="创建第一套简历并上传 v1。" actionLabel="新建简历" onAction={() => setCreateOpen(true)} /> : <div className="space-y-3">
       {sorted.map((resume) => {
         const resumeVersions = versions.filter((v) => v.resumeId === resume.id).sort((a, b) => b.version - a.version)

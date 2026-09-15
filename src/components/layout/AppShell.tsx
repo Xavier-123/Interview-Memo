@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { TopNav } from '@/components/layout/TopNav'
 import { ReminderBanner } from '@/components/layout/ReminderBanner'
@@ -11,6 +11,7 @@ import { useEffect } from 'react'
 
 export function AppShell() {
   const hydrated = useAppStore((s) => s.hydrated)
+  const location = useLocation()
   useInterviewReminders()
 
   useEffect(() => {
@@ -45,7 +46,9 @@ export function AppShell() {
           <StorageErrorBanner />
           <ReminderBanner />
           <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-            <Outlet />
+            <div key={location.pathname} className="animate-in fade-in slide-in-from-bottom-1 duration-300">
+              <Outlet />
+            </div>
           </main>
         </div>
       </div>

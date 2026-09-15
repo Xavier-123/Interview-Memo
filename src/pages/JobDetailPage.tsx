@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Bot, Calendar, Pencil, Plus, Trash2 } from 'lucide-react'
+import { ArrowLeft, Bot, Briefcase, Calendar, Pencil, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { StatusBadge } from '@/components/common/StatusBadge'
@@ -65,6 +65,7 @@ export function JobDetailPage() {
       </Button>
 
       <PageHeader
+        icon={Briefcase}
         title={job.title}
         description={`${company?.name ?? '未知公司'} · ${job.location}${job.salaryText ? ` · ${job.salaryText}` : ''}`}
         actions={

@@ -27,6 +27,9 @@ export function TopNav() {
   const navigate = useNavigate()
   const [searchOpen, setSearchOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [systemDark, setSystemDark] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches,
+  )
   const companies = useAppStore((s) => s.companies)
   const jobs = useAppStore((s) => s.jobs)
   const interviews = useAppStore((s) => s.interviews)
@@ -106,18 +109,21 @@ export function TopNav() {
   }, [])
 
   useEffect(() => {
-    const root = document.documentElement
-    const theme = settings.theme
-    if (theme === 'system') {
-      const mq = window.matchMedia('(prefers-color-scheme: dark)')
-      root.classList.toggle('dark', mq.matches)
-    } else {
-      root.classList.toggle('dark', theme === 'dark')
-    }
-  }, [settings.theme])
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    const onChange = (e: MediaQueryListEvent) => setSystemDark(e.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+
+  const resolvedDark =
+    settings.theme === 'dark' || (settings.theme === 'system' && systemDark)
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', resolvedDark)
+  }, [resolvedDark])
 
   const toggleTheme = () => {
-    updateSettings({ theme: settings.theme === 'dark' ? 'light' : 'dark' })
+    updateSettings({ theme: resolvedDark ? 'light' : 'dark' })
   }
 
   const go = (path: string) => {
@@ -142,12 +148,12 @@ export function TopNav() {
         <div className="hidden flex-1 lg:block">
           <Button
             variant="outline"
-            className="h-9 w-full max-w-sm justify-start text-muted-foreground"
+            className="h-9 w-full max-w-sm justify-start text-sm font-normal text-muted-foreground shadow-none hover:border-primary/30"
             onClick={() => setSearchOpen(true)}
           >
-            <Search className="mr-2 h-4 w-4" />
+            <Search className="mr-2 h-4 w-4 text-muted-foreground/70" />
             搜索岗位、公司、面试、简历、题库...
-            <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium sm:flex">
+            <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded border bg-muted/80 px-1.5 font-mono text-[10px] font-medium text-muted-foreground sm:flex">
               Ctrl K
             </kbd>
           </Button>
@@ -172,8 +178,8 @@ export function TopNav() {
               <DropdownMenuItem onClick={() => navigate('/knowledge?new=1')}>新增题目</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button variant="ghost" size="icon" onClick={toggleTheme}>
-            {settings.theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="切换主题">
+            {resolvedDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
         </div>
       </header>

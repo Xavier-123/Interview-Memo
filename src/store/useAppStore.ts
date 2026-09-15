@@ -665,7 +665,7 @@ export const useAppStore = create<AppState>()(
     },
     {
       name: 'interview-memo:v1',
-      version: 6,
+      version: 7,
       migrate: migratePersistedState,
       storage: createJSONStorage(() => persistStorage),
       partialize: (state) => ({

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { Bot, FileUser, FolderKanban, Plus, Pencil, Trash2, Play } from 'lucide-react'
+import { Bot, FileUser, FolderKanban, Plus, Pencil, Trash2, Play, TriangleAlert } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { EmptyState } from '@/components/common/EmptyState'
@@ -83,6 +83,7 @@ export function MockInterviewPage() {
   return (
     <div>
       <PageHeader
+        icon={Bot}
         title="模拟面试"
         description="完整模拟或项目深挖，调用远程大模型进行多轮对话"
         actions={
@@ -93,8 +94,11 @@ export function MockInterviewPage() {
       />
 
       {!llmReady && (
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm dark:border-amber-900 dark:bg-amber-950/40">
-          <p>开始模拟前需配置大模型 API。你仍可先上传简历与项目。</p>
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm">
+          <p className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+            <TriangleAlert className="h-4 w-4 shrink-0" />
+            开始模拟前需配置大模型 API。你仍可先上传简历与项目。
+          </p>
           <Button variant="outline" size="sm" onClick={() => navigate('/settings')}>前往设置</Button>
         </div>
       )}
@@ -135,7 +139,7 @@ export function MockInterviewPage() {
                         {project.techStack.length > 0 && (
                           <div className="mt-2 flex flex-wrap gap-1">
                             {project.techStack.slice(0, 4).map((t) => (
-                              <Badge key={t} variant="secondary" className="text-[10px]">{t}</Badge>
+                              <Badge key={t} variant="secondary" className="text-xs font-normal text-muted-foreground">{t}</Badge>
                             ))}
                           </div>
                         )}
@@ -192,7 +196,7 @@ export function MockInterviewPage() {
                 return (
                   <div
                     key={session.id}
-                    className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between"
+                    className="flex flex-col gap-3 rounded-lg border p-4 transition-all hover:border-primary/40 hover:bg-accent/30 hover:shadow-sm sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div>
                       <div className="flex flex-wrap items-center gap-2">

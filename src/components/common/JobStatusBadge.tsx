@@ -1,13 +1,14 @@
-import { INTERVIEW_STATUS_META, type InterviewStatus } from '@/types'
+import { JOB_STATUS_LABELS, JOB_STATUS_META } from '@/types'
+import type { JobStatus } from '@/types'
 import { cn } from '@/lib/utils'
 
-interface StatusBadgeProps {
-  status: InterviewStatus
+interface JobStatusBadgeProps {
+  status: JobStatus
   className?: string
 }
 
-export function StatusBadge({ status, className }: StatusBadgeProps) {
-  const meta = INTERVIEW_STATUS_META[status]
+export function JobStatusBadge({ status, className }: JobStatusBadgeProps) {
+  const meta = JOB_STATUS_META[status]
   return (
     <span
       className={cn(
@@ -17,7 +18,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
       )}
     >
       <span className={cn('h-1.5 w-1.5 rounded-full', meta.dot)} />
-      {meta.label}
+      {JOB_STATUS_LABELS[status]}
     </span>
   )
 }

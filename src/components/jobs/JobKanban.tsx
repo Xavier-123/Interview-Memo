@@ -12,7 +12,7 @@ import {
 } from '@dnd-kit/core'
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { MapPin, MoreHorizontal, Trash2, Pencil, Bot } from 'lucide-react'
+import { Banknote, Bot, Building2, MapPin, MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -26,7 +26,7 @@ import {
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { useAppStore } from '@/store/useAppStore'
 import { formatResumeVersionLabel, getCompanyName, selectJobNextInterview } from '@/store/selectors'
-import { JOB_STATUS_LABELS, JOB_STATUS_ORDER, type Job, type JobStatus } from '@/types'
+import { JOB_STATUS_LABELS, JOB_STATUS_META, JOB_STATUS_ORDER, type Job, type JobStatus } from '@/types'
 import { formatDateTime } from '@/lib/date'
 import { cn } from '@/lib/utils'
 import { UpcomingIndicator, urgencyCardClass } from '@/components/common/UpcomingIndicator'
@@ -56,10 +56,18 @@ function SortableJobCard({ job, companyName, onEdit, onDelete }: JobCardProps) {
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <Card className={cn('cursor-grab transition-shadow hover:shadow-md active:cursor-grabbing', isDragging && 'opacity-50')}>
+      <Card
+        className={cn(
+          'cursor-grab transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:cursor-grabbing',
+          isDragging && 'opacity-50',
+        )}
+      >
         <CardContent className="p-3">
-          <div className="mb-2 flex items-start justify-between">
-            <p className="text-xs font-medium text-muted-foreground">🏢 {companyName}</p>
+          <div className="mb-2 flex items-start justify-between gap-2">
+            <p className="flex min-w-0 items-center gap-1 text-xs font-medium text-muted-foreground">
+              <Building2 className="h-3 w-3 shrink-0" />
+              <span className="truncate">{companyName}</span>
+            </p>
             <DropdownMenu>
               <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                 <Button variant="ghost" size="icon" className="h-6 w-6" onPointerDown={(e) => e.stopPropagation()}>
@@ -89,10 +97,18 @@ function SortableJobCard({ job, companyName, onEdit, onDelete }: JobCardProps) {
               {job.title}
             </Link>
           </p>
-          <Badge variant={job.resumeVersionId ? 'secondary' : 'destructive'} className="mt-2 text-[10px]">{formatResumeVersionLabel(resumeState, job.resumeVersionId)}</Badge>
+          <Badge
+            variant="outline"
+            className={cn(
+              'mt-2 gap-1 text-xs font-normal',
+              job.resumeVersionId ? 'text-muted-foreground' : 'border-destructive/40 text-destructive',
+            )}
+          >
+            {formatResumeVersionLabel(resumeState, job.resumeVersionId)}
+          </Badge>
           <div className="mt-2 space-y-1 text-xs text-muted-foreground">
             <p className="flex items-center gap-1"><MapPin className="h-3 w-3" />{job.location}</p>
-            <p>💰 {job.salaryText}</p>
+            <p className="flex items-center gap-1"><Banknote className="h-3 w-3" />{job.salaryText}</p>
           </div>
           {nextInterview && (
             <div
@@ -111,7 +127,7 @@ function SortableJobCard({ job, companyName, onEdit, onDelete }: JobCardProps) {
           {job.tags.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1">
               {job.tags.slice(0, 3).map((t) => (
-                <Badge key={t} variant="outline" className="text-[10px] font-normal">#{t}</Badge>
+                <Badge key={t} variant="secondary" className="text-xs font-normal text-muted-foreground">#{t}</Badge>
               ))}
             </div>
           )}
@@ -219,16 +235,17 @@ function KanbanColumn({
       ref={setNodeRef}
       className={cn(
         'flex w-[280px] shrink-0 flex-col rounded-lg border bg-muted/30 transition-colors',
-        isOver && 'border-primary bg-accent/20',
+        isOver && 'border-primary/60 bg-accent/30',
       )}
     >
       <div className="flex items-center justify-between border-b px-3 py-2">
         <div className="flex items-center gap-2">
+          <span className={cn('h-2 w-2 shrink-0 rounded-full', JOB_STATUS_META[status].dot)} />
           <span className="text-sm font-medium">{JOB_STATUS_LABELS[status]}</span>
           <Badge variant="secondary" className="h-5 px-1.5 text-xs">{jobs.length}</Badge>
         </div>
-        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onAdd}>
-          +
+        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground" onClick={onAdd} aria-label="新增岗位">
+          <Plus className="h-3.5 w-3.5" />
         </Button>
       </div>
       <SortableContext items={jobs.map((j) => j.id)} strategy={verticalListSortingStrategy}>

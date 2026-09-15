@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ArrowUp, ArrowUpDown } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
+import { JobStatusBadge } from '@/components/common/JobStatusBadge'
 import { useAppStore } from '@/store/useAppStore'
 import { formatResumeVersionLabel, getCompanyName } from '@/store/selectors'
 import { JobRowActions } from '@/components/jobs/JobRowActions'
-import { JOB_STATUS_LABELS, type Job } from '@/types'
+import type { Job } from '@/types'
+import { cn } from '@/lib/utils'
 
 interface JobTableProps {
   jobs: Job[]
@@ -31,11 +34,29 @@ export function JobTable({ jobs, onEdit, onDelete }: JobTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="cursor-pointer" onClick={() => setSortKey('title')}>岗位</TableHead>
+              <TableHead className="cursor-pointer select-none" onClick={() => setSortKey('title')}>
+                <span className="inline-flex items-center gap-1">
+                  岗位
+                  {sortKey === 'title' ? (
+                    <ArrowUp className="h-3 w-3 text-primary" />
+                  ) : (
+                    <ArrowUpDown className="h-3 w-3 text-muted-foreground/50" />
+                  )}
+                </span>
+              </TableHead>
               <TableHead>公司</TableHead>
               <TableHead>地点</TableHead>
               <TableHead>薪资</TableHead>
-              <TableHead className="cursor-pointer" onClick={() => setSortKey('status')}>状态</TableHead>
+              <TableHead className="cursor-pointer select-none" onClick={() => setSortKey('status')}>
+                <span className="inline-flex items-center gap-1">
+                  状态
+                  {sortKey === 'status' ? (
+                    <ArrowUp className="h-3 w-3 text-primary" />
+                  ) : (
+                    <ArrowUpDown className="h-3 w-3 text-muted-foreground/50" />
+                  )}
+                </span>
+              </TableHead>
               <TableHead>投递简历</TableHead>
               <TableHead>标签</TableHead>
               <TableHead className="w-24">操作</TableHead>
@@ -51,9 +72,19 @@ export function JobTable({ jobs, onEdit, onDelete }: JobTableProps) {
                 </TableCell>
                 <TableCell>{getCompanyName(companies, job.companyId)}</TableCell>
                 <TableCell>{job.location}</TableCell>
-                <TableCell>{job.salaryText}</TableCell>
-                <TableCell>{JOB_STATUS_LABELS[job.status]}</TableCell>
-                <TableCell><Badge variant={job.resumeVersionId ? 'secondary' : 'destructive'}>{formatResumeVersionLabel(resumeState, job.resumeVersionId)}</Badge></TableCell>
+                <TableCell className="tabular-nums">{job.salaryText}</TableCell>
+                <TableCell><JobStatusBadge status={job.status} /></TableCell>
+                <TableCell>
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      'font-normal',
+                      job.resumeVersionId ? 'text-muted-foreground' : 'border-destructive/40 text-destructive',
+                    )}
+                  >
+                    {formatResumeVersionLabel(resumeState, job.resumeVersionId)}
+                  </Badge>
+                </TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
                     {job.tags.slice(0, 2).map((t) => (
@@ -81,9 +112,17 @@ export function JobTable({ jobs, onEdit, onDelete }: JobTableProps) {
             <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
               <span>{job.location}</span>
               <span>{job.salaryText}</span>
-              <span>{JOB_STATUS_LABELS[job.status]}</span>
             </div>
-            <Badge className="mt-2" variant={job.resumeVersionId ? 'secondary' : 'destructive'}>{formatResumeVersionLabel(resumeState, job.resumeVersionId)}</Badge>
+            <div className="mt-2"><JobStatusBadge status={job.status} /></div>
+            <Badge
+              variant="outline"
+              className={cn(
+                'mt-2 font-normal',
+                job.resumeVersionId ? 'text-muted-foreground' : 'border-destructive/40 text-destructive',
+              )}
+            >
+              {formatResumeVersionLabel(resumeState, job.resumeVersionId)}
+            </Badge>
             <div className="mt-3">
               <JobRowActions job={job} onEdit={onEdit} onDelete={onDelete} />
             </div>

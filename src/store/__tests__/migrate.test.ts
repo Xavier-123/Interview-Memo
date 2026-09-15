@@ -1,7 +1,23 @@
 import { describe, expect, it } from 'vitest'
 import { migrateLegacyResumeData, migratePersistedState } from '@/store/migrate'
+import { JOB_STATUS_LABELS, JOB_STATUS_ORDER, ROUND_TO_JOB_STATUS } from '@/types'
 
 describe('migratePersistedState', () => {
+  it('defines the new job status order and written-test mapping', () => {
+    expect(JOB_STATUS_ORDER).toEqual([
+      'applied',
+      'screening',
+      'written_test',
+      'round1',
+      'round2',
+      'hr',
+      'offer',
+      'closed',
+    ])
+    expect(JOB_STATUS_LABELS.written_test).toBe('笔试')
+    expect(ROUND_TO_JOB_STATUS['笔试']).toBe('written_test')
+  })
+
   it('adds knowledgeCategories at version 5', () => {
     const state = migratePersistedState(
       {
@@ -13,6 +29,17 @@ describe('migratePersistedState', () => {
     )
     expect(state.settings.knowledgeCategories).toBeDefined()
     expect(Object.keys(state.settings.knowledgeCategories).length).toBeGreaterThan(0)
+  })
+
+  it('migrates the removed wishlist status to applied', () => {
+    const state = migratePersistedState(
+      {
+        settings: { userName: 'u', theme: 'light', seeded: true, weekStartsOn: 1 },
+        jobs: [{ id: 'j1', status: 'wishlist' }],
+      },
+      6,
+    )
+    expect(state.jobs[0]?.status).toBe('applied')
   })
 })
 

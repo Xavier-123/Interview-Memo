@@ -69,7 +69,7 @@ export function migrateLegacyResumeData<T extends LegacyResumeState>(
 }
 
 export function migratePersistedState(persisted: unknown, version: number): AppState {
-  const state = persisted as AppState
+  let state = persisted as AppState
   if (version < 2) {
     state.settings = normalizeSettings(state.settings)
     state.knowledge = (state.knowledge ?? []).map(normalizeKnowledge)
@@ -87,7 +87,10 @@ export function migratePersistedState(persisted: unknown, version: number): AppS
     state.settings = normalizeSettings(state.settings)
   }
   if (version < 6) {
-    return migrateLegacyResumeData(state) as AppState
+    state = migrateLegacyResumeData(state) as AppState
+  }
+  if (version < 7) {
+    state.jobs = (state.jobs ?? []).map(normalizeJob)
   }
   return migrateLegacyResumeData(state) as AppState
 }

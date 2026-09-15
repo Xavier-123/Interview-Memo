@@ -1,15 +1,15 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Building2 } from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { StatusBadge } from '@/components/common/StatusBadge'
+import { JobStatusBadge } from '@/components/common/JobStatusBadge'
 import { ErrorState } from '@/components/common/ErrorState'
 import { StarRating } from '@/components/common/StarRating'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useAppStore } from '@/store/useAppStore'
-import { JOB_STATUS_LABELS } from '@/types'
 import { formatDateTime } from '@/lib/date'
 
 export function CompanyDetailPage() {
@@ -36,7 +36,7 @@ export function CompanyDetailPage() {
         <ArrowLeft className="h-4 w-4" /> 返回
       </Button>
 
-      <PageHeader title={company.name} description={`${company.industry} · ${company.location}`} />
+      <PageHeader icon={Building2} title={company.name} description={`${company.industry} · ${company.location}`} />
 
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
         <Card>
@@ -93,7 +93,7 @@ export function CompanyDetailPage() {
                         {expandedJdId === j.id ? '收起 JD' : '查看 JD'}
                       </Button>
                     )}
-                    <Badge variant="outline">{JOB_STATUS_LABELS[j.status]}</Badge>
+                    <JobStatusBadge status={j.status} />
                   </div>
                 </div>
                 {expandedJdId === j.id && (
@@ -117,7 +117,7 @@ export function CompanyDetailPage() {
               <Link
                 key={i.id}
                 to={`/interviews/${i.id}`}
-                className="flex items-center justify-between rounded-md border p-3 transition-colors hover:bg-accent/50"
+                className="flex items-center justify-between rounded-md border p-3 transition-all hover:border-primary/40 hover:bg-accent/30 hover:shadow-sm"
               >
                 <div>
                   <p className="text-sm font-medium">{job?.title}</p>

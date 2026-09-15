@@ -36,7 +36,7 @@ export function JobsPage() {
   const [typeFilter, setTypeFilter] = useState('all')
   const [formOpen, setFormOpen] = useState(false)
   const [editingJob, setEditingJob] = useState<Job | null>(null)
-  const [defaultStatus, setDefaultStatus] = useState<JobStatus>('wishlist')
+  const [defaultStatus, setDefaultStatus] = useState<JobStatus>('applied')
   const [deleteJob, setDeleteJob] = useState<Job | null>(null)
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export function JobsPage() {
 
   const openCreate = (status?: JobStatus) => {
     setEditingJob(null)
-    setDefaultStatus(status ?? 'wishlist')
+    setDefaultStatus(status ?? 'applied')
     setFormOpen(true)
   }
 
@@ -76,8 +76,9 @@ export function JobsPage() {
   return (
     <div>
       <PageHeader
+        icon={Briefcase}
         title="岗位管理"
-        description="Kanban 看板与表格双模式，拖拽更新求职进度"
+        description="看板与表格双模式，拖拽更新求职进度"
         actions={
           <Button onClick={() => openCreate()}>
             <Plus className="h-4 w-4" /> 新增岗位
@@ -117,8 +118,8 @@ export function JobsPage() {
       ) : (
         <Tabs defaultValue="kanban">
           <TabsList>
-            <TabsTrigger value="kanban">Kanban</TabsTrigger>
-            <TabsTrigger value="table">Table</TabsTrigger>
+            <TabsTrigger value="kanban">看板</TabsTrigger>
+            <TabsTrigger value="table">表格</TabsTrigger>
           </TabsList>
           <TabsContent value="kanban">
             <JobKanban jobs={filtered} onEdit={openEdit} onDelete={handleDelete} onAdd={openCreate} />

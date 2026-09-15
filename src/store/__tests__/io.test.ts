@@ -33,6 +33,15 @@ describe('validateImportData', () => {
     expect(migrated.resumeVersions[0]?.summary).toBe('旧简历')
   })
 
+  it('normalizes the removed wishlist status when importing v2 data', () => {
+    const data = getDemoData()
+    const imported = validateImportData({
+      ...data,
+      jobs: [{ ...data.jobs[0], status: 'wishlist' }, ...data.jobs.slice(1)],
+    })
+    expect(imported.jobs[0]?.status).toBe('applied')
+  })
+
   it('reports missing interview field', () => {
     const data = getDemoData()
     const broken = {

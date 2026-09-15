@@ -33,7 +33,10 @@ export function normalizeKnowledge(k: Knowledge): Knowledge {
 }
 
 export function normalizeJob(j: Job): Job {
-  return { ...j, jd: j.jd ?? '' }
+  // Keep old persisted/imported data usable after removing the wishlist stage.
+  const legacyStatus = (j as { status?: string }).status
+  const status = legacyStatus === 'wishlist' ? 'applied' : j.status
+  return { ...j, status: status as Job['status'], jd: j.jd ?? '' }
 }
 
 export function normalizeResumeProfile(profile?: Partial<ResumeProfile>): ResumeProfile {

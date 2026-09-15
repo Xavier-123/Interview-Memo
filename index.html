@@ -4,10 +4,29 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="本地优先的求职面试管理工作台：岗位看板、面试记录、复盘与个人题库" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#09090b" />
     <title>Interview Memo - AI 求职面试管理工作台</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script>
+      // 在首帧渲染前应用持久化的主题，避免深色模式刷新时闪白
+      ;(function () {
+        try {
+          var raw = localStorage.getItem('interview-memo:v1')
+          var theme = raw ? JSON.parse(raw).state.theme : undefined
+          var dark =
+            theme === 'dark' ||
+            ((theme === undefined || theme === 'system') &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches)
+          if (dark) document.documentElement.classList.add('dark')
+        } catch (e) {
+          /* 忽略解析失败，保持默认浅色 */
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

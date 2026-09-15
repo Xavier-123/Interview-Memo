@@ -1,9 +1,11 @@
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { BellRing, Database, Settings, Sparkles, Tags, TriangleAlert, User } from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { TagInput } from '@/components/common/TagInput'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -163,11 +165,16 @@ export function SettingsPage() {
 
   return (
     <div>
-      <PageHeader title="设置" description="个性化配置与数据管理" />
+      <PageHeader icon={Settings} title="设置" description="个性化配置与数据管理" />
 
       <div className="grid max-w-2xl gap-6">
         <Card>
-          <CardHeader><CardTitle>个人设置</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-4 w-4 text-primary" />
+              个人设置
+            </CardTitle>
+          </CardHeader>
           <CardContent className="grid gap-4">
             <div className="space-y-2">
               <Label>用户名</Label>
@@ -202,7 +209,10 @@ export function SettingsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>题库分类</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Tags className="h-4 w-4 text-primary" />
+              题库分类
+            </CardTitle>
             <CardDescription>自定义分类与子分类，新建题目时默认使用第一项</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -227,7 +237,10 @@ export function SettingsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>面试提醒</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <BellRing className="h-4 w-4 text-primary" />
+              面试提醒
+            </CardTitle>
             <CardDescription>应用内 Toast + 可选浏览器系统通知（页面打开时生效）</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -273,7 +286,15 @@ export function SettingsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>大模型配置</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              大模型配置
+              {isLlmConfigured(settings.llm) && (
+                <Badge variant="outline" className="border-success/30 bg-success/10 text-success">
+                  已配置
+                </Badge>
+              )}
+            </CardTitle>
             <CardDescription>
               用于面试题同题判定、AI 学习建议与模拟面试。启用后简历与项目内容会发往你配置的 API。API Key 存于本机 localStorage，导出 JSON 时会剔除。
             </CardDescription>
@@ -325,7 +346,10 @@ export function SettingsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>数据管理</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Database className="h-4 w-4 text-primary" />
+              数据管理
+            </CardTitle>
             <CardDescription>导入 / 导出 JSON，方便迁移与备份</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -347,9 +371,9 @@ export function SettingsPage() {
                 </Button>
               </div>
             )}
-            <Button onClick={handleExport}>Export Data</Button>
+            <Button onClick={handleExport}>导出数据</Button>
             <div className="space-y-2">
-              <Label>Import Data</Label>
+              <Label>导入数据</Label>
               <Select value={importMode} onValueChange={(v) => setImportMode(v as 'replace' | 'merge')}>
                 <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -360,9 +384,16 @@ export function SettingsPage() {
               <input ref={fileRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
               <Button variant="outline" onClick={() => fileRef.current?.click()}>选择 JSON 文件</Button>
             </div>
-            <div className="flex flex-wrap gap-2 pt-2">
-              <Button variant="outline" onClick={() => setResetOpen(true)}>重置演示数据</Button>
-              <Button variant="destructive" onClick={() => setClearOpen(true)}>清空所有数据</Button>
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+              <p className="flex items-center gap-1.5 text-sm font-medium text-destructive">
+                <TriangleAlert className="h-4 w-4" />
+                危险操作
+              </p>
+              <p className="mt-0.5 text-xs text-muted-foreground">以下操作会覆盖或删除本地数据，请先导出备份</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button variant="outline" onClick={() => setResetOpen(true)}>重置演示数据</Button>
+                <Button variant="destructive" onClick={() => setClearOpen(true)}>清空所有数据</Button>
+              </div>
             </div>
           </CardContent>
         </Card>

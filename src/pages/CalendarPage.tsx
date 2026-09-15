@@ -17,7 +17,7 @@ import {
   subWeeks,
 } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
+import { Calendar, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { InterviewFormDialog } from '@/components/interviews/InterviewFormDialog'
 import { Button } from '@/components/ui/button'
@@ -80,7 +80,7 @@ export function CalendarPage() {
 
   return (
     <div>
-      <PageHeader title="面试日历" description="Month / Week / Day 视图" />
+      <PageHeader icon={Calendar} title="面试日历" description="月 / 周 / 日视图查看即将到来的面试" />
 
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
@@ -101,22 +101,26 @@ export function CalendarPage() {
       </div>
 
       {view === 'month' && (
-        <div className="rounded-lg border">
+        <div className="overflow-hidden rounded-lg border">
           <div className="grid grid-cols-7 border-b bg-muted/50">
-            {['一', '二', '三', '四', '五', '六', '日'].map((d) => (
-              <div key={d} className="p-2 text-center text-xs font-medium text-muted-foreground">{d}</div>
+            {monthDays.slice(0, 7).map((day) => (
+              <div key={day.toISOString()} className="p-2 text-center text-xs font-medium text-muted-foreground">
+                {format(day, 'EEE', { locale: zhCN })}
+              </div>
             ))}
           </div>
           <div className="grid grid-cols-7">
             {monthDays.map((day) => {
               const events = getEventsForDay(day)
+              const isWeekend = day.getDay() === 0 || day.getDay() === 6
               return (
                 <div
                   key={day.toISOString()}
                   className={cn(
-                    'group min-h-24 border-b border-r p-1 transition-colors hover:bg-accent/30',
+                    'group min-h-24 border-b border-r p-1 transition-colors hover:bg-accent/30 [&:nth-child(7n)]:border-r-0',
+                    isWeekend && 'bg-muted/30',
                     !isSameMonth(day, current) && 'bg-muted/20 text-muted-foreground',
-                    isToday(day) && 'bg-primary/[0.04] dark:bg-primary/[0.08]',
+                    isToday(day) && 'bg-primary/[0.08] ring-1 ring-inset ring-primary/25',
                   )}
                 >
                   <div className="flex items-center justify-between">
@@ -136,7 +140,7 @@ export function CalendarPage() {
                     {events.slice(0, 2).map((e) => (
                       <EventChip key={e.id} event={e} />
                     ))}
-                    {events.length > 2 && <p className="text-[10px] text-muted-foreground">+{events.length - 2} 更多</p>}
+                    {events.length > 2 && <p className="text-[11px] text-muted-foreground">+{events.length - 2} 更多</p>}
                   </div>
                 </div>
               )
@@ -150,7 +154,10 @@ export function CalendarPage() {
           {weekDays.map((day) => (
             <div
               key={day.toISOString()}
-              className={cn('rounded-lg border p-2', isToday(day) && 'border-primary/60 bg-primary/[0.04] dark:bg-primary/[0.08]')}
+              className={cn(
+                'rounded-lg border p-2 transition-colors hover:border-primary/40',
+                isToday(day) && 'border-primary/60 bg-primary/[0.06]',
+              )}
             >
               <p className={cn('mb-2 text-xs font-medium', isToday(day) && 'text-primary')}>
                 {format(day, 'M/d EEE', { locale: zhCN })}
@@ -221,7 +228,7 @@ function EventChip({
         <Link
           to={`/interviews/${event.id}`}
           className={cn(
-            'block rounded border bg-card px-1.5 py-1 text-[10px] leading-tight transition-shadow hover:shadow-sm',
+            'block rounded-md border bg-card px-1.5 py-1 text-[11px] leading-tight transition-shadow hover:shadow-sm',
             soon && urgencyMeta.card,
             urgency === 'today' && 'border-primary/40',
           )}

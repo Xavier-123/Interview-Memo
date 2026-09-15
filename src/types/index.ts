@@ -1,7 +1,7 @@
 export type JobStatus =
-  | 'wishlist'
   | 'applied'
   | 'screening'
+  | 'written_test'
   | 'round1'
   | 'round2'
   | 'hr'
@@ -292,9 +292,9 @@ export interface ExportData {
 }
 
 export const JOB_STATUS_ORDER: JobStatus[] = [
-  'wishlist',
   'applied',
   'screening',
+  'written_test',
   'round1',
   'round2',
   'hr',
@@ -303,9 +303,9 @@ export const JOB_STATUS_ORDER: JobStatus[] = [
 ]
 
 export const JOB_STATUS_LABELS: Record<JobStatus, string> = {
-  wishlist: '待投递',
   applied: '已投递',
   screening: '简历通过',
+  written_test: '笔试',
   round1: '一面',
   round2: '二面',
   hr: 'HR面',
@@ -313,22 +313,81 @@ export const JOB_STATUS_LABELS: Record<JobStatus, string> = {
   closed: '已结束',
 }
 
+export const JOB_STATUS_META: Record<JobStatus, { color: string; dot: string }> = {
+  applied: {
+    color: 'bg-blue-500/10 text-blue-700 border-blue-500/25 dark:text-blue-400',
+    dot: 'bg-blue-500',
+  },
+  screening: {
+    color: 'bg-cyan-500/10 text-cyan-700 border-cyan-500/25 dark:text-cyan-400',
+    dot: 'bg-cyan-500',
+  },
+  written_test: {
+    color: 'bg-sky-500/10 text-sky-700 border-sky-500/25 dark:text-sky-400',
+    dot: 'bg-sky-500',
+  },
+  round1: {
+    color: 'bg-violet-500/10 text-violet-700 border-violet-500/25 dark:text-violet-400',
+    dot: 'bg-violet-500',
+  },
+  round2: {
+    color: 'bg-purple-500/10 text-purple-700 border-purple-500/25 dark:text-purple-400',
+    dot: 'bg-purple-500',
+  },
+  hr: {
+    color: 'bg-fuchsia-500/10 text-fuchsia-700 border-fuchsia-500/25 dark:text-fuchsia-400',
+    dot: 'bg-fuchsia-500',
+  },
+  offer: {
+    color: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/25 dark:text-emerald-400',
+    dot: 'bg-emerald-500',
+  },
+  closed: {
+    color: 'bg-zinc-500/10 text-zinc-600 border-zinc-500/25 dark:text-zinc-400',
+    dot: 'bg-zinc-400',
+  },
+}
+
 export const INTERVIEW_STATUS_META: Record<
   InterviewStatus,
   { label: string; color: string; dot: string }
 > = {
-  scheduled: { label: '待面试', color: 'bg-yellow-100 text-yellow-800 border-yellow-200', dot: 'bg-yellow-500' },
-  completed: { label: '已完成', color: 'bg-green-100 text-green-800 border-green-200', dot: 'bg-green-500' },
-  pending_feedback: { label: '等待反馈', color: 'bg-orange-100 text-orange-800 border-orange-200', dot: 'bg-orange-500' },
-  passed: { label: '已通过', color: 'bg-green-100 text-green-800 border-green-200', dot: 'bg-green-500' },
-  failed: { label: '未通过', color: 'bg-red-100 text-red-800 border-red-200', dot: 'bg-red-500' },
-  cancelled: { label: '已取消', color: 'bg-gray-100 text-gray-800 border-gray-200', dot: 'bg-gray-400' },
+  scheduled: {
+    label: '待面试',
+    color: 'bg-amber-500/10 text-amber-700 border-amber-500/25 dark:text-amber-400',
+    dot: 'bg-amber-500',
+  },
+  completed: {
+    label: '已完成',
+    color: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/25 dark:text-emerald-400',
+    dot: 'bg-emerald-500',
+  },
+  pending_feedback: {
+    label: '等待反馈',
+    color: 'bg-orange-500/10 text-orange-700 border-orange-500/25 dark:text-orange-400',
+    dot: 'bg-orange-500',
+  },
+  passed: {
+    label: '已通过',
+    color: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/25 dark:text-emerald-400',
+    dot: 'bg-emerald-500',
+  },
+  failed: {
+    label: '未通过',
+    color: 'bg-red-500/10 text-red-700 border-red-500/25 dark:text-red-400',
+    dot: 'bg-red-500',
+  },
+  cancelled: {
+    label: '已取消',
+    color: 'bg-zinc-500/10 text-zinc-600 border-zinc-500/25 dark:text-zinc-400',
+    dot: 'bg-zinc-400',
+  },
 }
 
-export const MASTERY_META: Record<Mastery, { label: string; emoji: string; color: string }> = {
-  good: { label: '熟练', emoji: '🟢', color: 'text-green-600' },
-  fair: { label: '一般', emoji: '🟡', color: 'text-yellow-600' },
-  poor: { label: '不熟', emoji: '🔴', color: 'text-red-600' },
+export const MASTERY_META: Record<Mastery, { label: string; color: string; dot: string }> = {
+  good: { label: '熟练', color: 'text-emerald-700 dark:text-emerald-400', dot: 'bg-emerald-500' },
+  fair: { label: '一般', color: 'text-amber-700 dark:text-amber-400', dot: 'bg-amber-500' },
+  poor: { label: '不熟', color: 'text-red-700 dark:text-red-400', dot: 'bg-red-500' },
 }
 
 export const KNOWLEDGE_CATEGORIES: Record<string, string[]> = {
@@ -345,5 +404,5 @@ export const ROUND_TO_JOB_STATUS: Partial<Record<InterviewRound, JobStatus>> = {
   三面: 'round2',
   HR面: 'hr',
   加面: 'round2',
-  笔试: 'screening',
+  笔试: 'written_test',
 }

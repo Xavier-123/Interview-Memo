@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAppStore } from '@/store/useAppStore'
 import type { AppState } from '@/store/useAppStore'
 import { enrichInterviews, formatResumeVersionLabel } from '@/store/selectors'
-import { formatDateTime } from '@/lib/date'
+import { formatDate, formatDateTime } from '@/lib/date'
 import { cn } from '@/lib/utils'
 import { UpcomingIndicator, urgencyCardClass } from '@/components/common/UpcomingIndicator'
 import { INTERVIEW_ROUNDS, INTERVIEW_STATUS_META, type Interview, type InterviewStatus } from '@/types'
@@ -56,6 +56,7 @@ export function InterviewsPage() {
   return (
     <div>
       <PageHeader
+        icon={ClipboardList}
         title="面试管理"
         description="所有面试记录，按时间排序"
         actions={
@@ -102,21 +103,32 @@ export function InterviewsPage() {
               key={i.id}
               to={`/interviews/${i.id}`}
               className={cn(
-                'flex flex-col gap-2 rounded-lg border p-4 transition-colors hover:border-primary/40 hover:bg-accent/30 sm:flex-row sm:items-center sm:justify-between',
+                'flex flex-col gap-3 rounded-lg border p-4 transition-all hover:border-primary/40 hover:bg-accent/30 hover:shadow-sm sm:flex-row sm:items-center sm:gap-4',
                 urgencyCardClass(i.scheduledAt, i.status),
               )}
             >
-              <div>
+              <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center self-start rounded-lg bg-muted/70">
+                <span className="text-lg font-semibold leading-none tabular-nums">
+                  {formatDate(i.scheduledAt, 'dd')}
+                </span>
+                <span className="mt-1 text-[11px] text-muted-foreground">
+                  {formatDate(i.scheduledAt, 'EEE')}
+                </span>
+              </div>
+              <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-xs text-muted-foreground">{formatDateTime(i.scheduledAt).split(' ')[0]}</p>
+                  <p className="font-semibold">{i.company?.name}</p>
+                  <Badge variant="secondary" className="font-normal">{i.round}</Badge>
                   <UpcomingIndicator scheduledAt={i.scheduledAt} status={i.status} />
                 </div>
-                <p className="font-medium">{i.company?.name}</p>
-                <p className="text-sm text-muted-foreground">{i.job?.title}</p>
-                <p className="text-sm">{i.round}</p>
-                <p className={i.resumeVersion ? 'text-sm text-primary' : 'text-sm text-destructive'}>简历：{formatResumeVersionLabel(resumeState, i.job?.resumeVersionId)}</p>
+                <p className="mt-1 truncate text-sm text-muted-foreground">
+                  {i.job?.title} · {formatDateTime(i.scheduledAt)}
+                </p>
+                <p className={cn('mt-1 text-xs', i.resumeVersion ? 'text-muted-foreground/80' : 'text-destructive')}>
+                  简历：{formatResumeVersionLabel(resumeState, i.job?.resumeVersionId)}
+                </p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex shrink-0 items-center gap-2">
                 {i.hasReview && <Badge variant="secondary">已复盘</Badge>}
                 <StatusBadge status={i.status} />
               </div>

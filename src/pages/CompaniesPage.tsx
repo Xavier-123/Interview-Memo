@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Plus, Building2, Star } from 'lucide-react'
+import { Plus, Banknote, Building2, Briefcase, SignalHigh, Star } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { EmptyState } from '@/components/common/EmptyState'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
+import { JobStatusBadge } from '@/components/common/JobStatusBadge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -21,7 +22,23 @@ import { Textarea } from '@/components/ui/textarea'
 import { TagInput } from '@/components/common/TagInput'
 import { useAppStore } from '@/store/useAppStore'
 import { selectCompanyProgress } from '@/store/selectors'
-import { JOB_STATUS_LABELS, type Company } from '@/types'
+import type { Company } from '@/types'
+import { cn } from '@/lib/utils'
+
+const AVATAR_COLORS = [
+  'bg-violet-500/15 text-violet-600 dark:text-violet-400',
+  'bg-blue-500/15 text-blue-600 dark:text-blue-400',
+  'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
+  'bg-amber-500/15 text-amber-600 dark:text-amber-400',
+  'bg-rose-500/15 text-rose-600 dark:text-rose-400',
+  'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400',
+]
+
+const avatarColor = (name: string) => {
+  let hash = 0
+  for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) | 0
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length]
+}
 
 export function CompanyFormDialog({
   open,
@@ -131,6 +148,7 @@ export function CompaniesPage() {
   return (
     <div>
       <PageHeader
+        icon={Building2}
         title="公司管理"
         description="维护公司维度信息，关联多个岗位和面试"
         actions={<Button onClick={() => { setEditing(null); setFormOpen(true) }}><Plus className="h-4 w-4" /> 新增公司</Button>}
@@ -145,20 +163,42 @@ export function CompaniesPage() {
             const progress = selectCompanyProgress({ jobs }, c.id)
             const salaries = companyJobs.map((j) => j.salaryText).filter(Boolean)
             return (
-              <Card key={c.id} className="transition-shadow hover:shadow-md">
+              <Card key={c.id} className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <CardContent className="p-4">
-                  <div className="mb-2 flex items-start justify-between">
-                    <Link to={`/companies/${c.id}`} className="font-semibold hover:text-primary">{c.name}</Link>
-                    <div className="flex items-center gap-0.5 text-sm">
+                  <div className="mb-2 flex items-start gap-3">
+                    <div
+                      className={cn(
+                        'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-base font-semibold',
+                        avatarColor(c.name),
+                      )}
+                      aria-hidden
+                    >
+                      {c.name.slice(0, 1)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <Link to={`/companies/${c.id}`} className="font-semibold hover:text-primary">{c.name}</Link>
+                      <p className="truncate text-sm text-muted-foreground">{c.industry} · {c.location}</p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-0.5 text-sm tabular-nums">
                       <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
                       {c.rating}
                     </div>
                   </div>
-                  <p className="text-sm text-muted-foreground">{c.industry} · {c.location}</p>
-                  <div className="mt-3 space-y-1 text-sm">
-                    <p>岗位：{companyJobs.length} 个</p>
-                    <p>进度：{JOB_STATUS_LABELS[progress]}</p>
-                    {salaries[0] && <p>薪资：{salaries[0]}</p>}
+                  <div className="mt-3 space-y-1.5 text-sm">
+                    <p className="flex items-center gap-1.5">
+                      <Briefcase className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      岗位 {companyJobs.length} 个
+                    </p>
+                    <p className="flex items-center gap-1.5">
+                      <SignalHigh className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      进度 {progress ? <JobStatusBadge status={progress} /> : <span className="text-muted-foreground">暂无岗位</span>}
+                    </p>
+                    {salaries[0] && (
+                      <p className="flex items-center gap-1.5 tabular-nums">
+                        <Banknote className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                        {salaries[0]}
+                      </p>
+                    )}
                   </div>
                   <div className="mt-3 flex flex-wrap gap-1">
                     {c.techDirections.slice(0, 3).map((t) => (

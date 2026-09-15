@@ -28,7 +28,7 @@ const jobTypes: JobType[] = ['算法', '后端', '全栈', '前端', '数据', '
 const priorities: JobPriority[] = ['high', 'medium', 'low']
 const priorityLabels: Record<JobPriority, string> = { high: '高', medium: '中', low: '低' }
 
-export function JobFormDialog({ open, onOpenChange, job, defaultStatus = 'wishlist' }: JobFormDialogProps) {
+export function JobFormDialog({ open, onOpenChange, job, defaultStatus = 'applied' }: JobFormDialogProps) {
   const companies = useAppStore((s) => s.companies)
   const resumes = useAppStore((s) => s.resumes)
   const resumeVersions = useAppStore((s) => s.resumeVersions)
