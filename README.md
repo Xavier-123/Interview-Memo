@@ -6,6 +6,8 @@
 
 精细化跟踪求职进展 · 沉淀高频真题题库 · 艾宾浩斯间隔复习 · 双引擎多轮模拟面试 · 摸鱼防偷窥模式
 
+**简体中文** | [English](./README_en.md)
+
 [![React 19](https://img.shields.io/badge/React-19.2-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-8.3-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)

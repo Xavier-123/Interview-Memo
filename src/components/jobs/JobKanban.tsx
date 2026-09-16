@@ -209,8 +209,12 @@ export function JobKanban({ jobs, onEdit, onDelete, onAdd }: JobKanbanProps) {
     setActiveJob(null)
     const { active, over } = event
     if (!over) return
-    const targetStatus = over.id as JobStatus
-    if (!JOB_STATUS_ORDER.includes(targetStatus)) return
+    // 碰撞检测可能解析到列内某张卡片（id 为岗位 id），此时取卡片所在的列
+    const overId = over.id as string
+    const targetStatus = JOB_STATUS_ORDER.includes(overId as JobStatus)
+      ? (overId as JobStatus)
+      : jobs.find((j) => j.id === overId)?.status
+    if (!targetStatus) return
     const jobId = active.id as string
     const current = jobs.find((j) => j.id === jobId)
     if (!current || current.status === targetStatus) return
