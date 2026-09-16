@@ -158,3 +158,14 @@
     scrollbar-color: var(--border) transparent;
   }
 }
+
+/* 最临近面试的呼吸光晕：光晕从边框向外扩散再收拢，配合 motion-safe:animate-[imminent-glow...] 使用 */
+@keyframes imminent-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 40%, transparent);
+  }
+  60% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary) 6%, transparent);
+  }
+}

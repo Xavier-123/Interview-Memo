@@ -16,6 +16,7 @@ import { useAppStore } from '@/store/useAppStore'
 import { resolveJobContext } from '@/store/selectors'
 import { hasResumeContent } from '@/lib/mockInterview'
 import { isLlmConfigured } from '@/lib/llm'
+import { isMockServiceConfigured } from '@/lib/settings'
 import type { InterviewRound, MockInterviewMode } from '@/types'
 
 interface StartMockDialogProps {
@@ -86,8 +87,8 @@ export function StartMockDialog({
   }
 
   const handleStart = () => {
-    if (!isLlmConfigured(settings.llm)) {
-      toast.error('请先在设置中配置大模型 API')
+    if (!isLlmConfigured(settings.llm) && !isMockServiceConfigured(settings)) {
+      toast.error('请先在设置中配置大模型 API 或外部模拟服务')
       return
     }
 
@@ -224,9 +225,20 @@ export function StartMockDialog({
           </TabsContent>
         </Tabs>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>取消</Button>
-          <Button onClick={handleStart}>开始模拟</Button>
+        <DialogFooter className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div className="text-xs text-muted-foreground">
+            {isMockServiceConfigured(settings) ? (
+              <span className="text-primary font-medium">⚡ 外部多 Agent 服务优先驱动</span>
+            ) : isLlmConfigured(settings.llm) ? (
+              <span>🤖 内置大模型引擎驱动</span>
+            ) : (
+              <span className="text-destructive">未配置引擎</span>
+            )}
+          </div>
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>取消</Button>
+            <Button onClick={handleStart}>开始模拟</Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

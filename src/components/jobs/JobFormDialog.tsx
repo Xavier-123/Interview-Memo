@@ -16,7 +16,17 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { TagInput } from '@/components/common/TagInput'
 import { DatePicker } from '@/components/ui/date-picker'
 import { useAppStore } from '@/store/useAppStore'
-import { JOB_STATUS_LABELS, JOB_STATUS_ORDER, type Job, type JobStatus, type JobType, type JobPriority } from '@/types'
+import {
+  JOB_CLOSE_REASON_LABELS,
+  JOB_CLOSE_REASONS,
+  JOB_STATUS_LABELS,
+  JOB_STATUS_ORDER,
+  type Job,
+  type JobCloseReason,
+  type JobPriority,
+  type JobStatus,
+  type JobType,
+} from '@/types'
 import { toast } from 'sonner'
 
 interface JobFormDialogProps {
@@ -46,6 +56,7 @@ export function JobFormDialog({ open, onOpenChange, job, defaultStatus = 'applie
   const [location, setLocation] = useState('')
   const [jobType, setJobType] = useState<JobType>('算法')
   const [status, setStatus] = useState<JobStatus>(defaultStatus)
+  const [closeReason, setCloseReason] = useState<JobCloseReason>('interview_failed')
   const [priority, setPriority] = useState<JobPriority>('medium')
   const [tags, setTags] = useState<string[]>([])
   const [description, setDescription] = useState('')
@@ -65,6 +76,7 @@ export function JobFormDialog({ open, onOpenChange, job, defaultStatus = 'applie
         setLocation(job.location)
         setJobType(job.jobType)
         setStatus(job.status)
+        setCloseReason(job.closeReason ?? 'interview_failed')
         setPriority(job.priority)
         setTags(job.tags)
         setDescription(job.description)
@@ -79,6 +91,7 @@ export function JobFormDialog({ open, onOpenChange, job, defaultStatus = 'applie
         setLocation('')
         setJobType('算法')
         setStatus(defaultStatus)
+        setCloseReason('interview_failed')
         setPriority('medium')
         setTags([])
         setDescription('')
@@ -118,6 +131,7 @@ export function JobFormDialog({ open, onOpenChange, job, defaultStatus = 'applie
       location: location || '未知',
       jobType,
       status,
+      closeReason: status === 'closed' ? closeReason : undefined,
       priority,
       tags,
       description,
@@ -253,6 +267,21 @@ export function JobFormDialog({ open, onOpenChange, job, defaultStatus = 'applie
               </Select>
             </div>
           </div>
+          {status === 'closed' && (
+            <div className="space-y-2">
+              <Label>结束原因</Label>
+              <Select value={closeReason} onValueChange={(v) => setCloseReason(v as JobCloseReason)}>
+                <SelectTrigger><SelectValue placeholder="请选择结束原因" /></SelectTrigger>
+                <SelectContent>
+                  {JOB_CLOSE_REASONS.map((r) => (
+                    <SelectItem key={r} value={r}>
+                      {JOB_CLOSE_REASON_LABELS[r]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>投递来源</Label>

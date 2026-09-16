@@ -12,7 +12,12 @@ import type {
   ResumeExperience,
   ResumeOtherInfo,
 } from '@/types'
-import { DEFAULT_LLM_SETTINGS, DEFAULT_REMINDER_SETTINGS, DEFAULT_RESUME_PROFILE } from '@/types'
+import {
+  DEFAULT_LLM_SETTINGS,
+  DEFAULT_MOCK_SERVICE_SETTINGS,
+  DEFAULT_REMINDER_SETTINGS,
+  DEFAULT_RESUME_PROFILE,
+} from '@/types'
 
 export function normalizeSettings(settings?: Partial<Settings>): Settings {
   return {
@@ -20,9 +25,14 @@ export function normalizeSettings(settings?: Partial<Settings>): Settings {
     ...settings,
     reminder: { ...DEFAULT_REMINDER_SETTINGS, ...settings?.reminder },
     llm: { ...DEFAULT_LLM_SETTINGS, ...settings?.llm },
+    mockService: { ...DEFAULT_MOCK_SERVICE_SETTINGS, ...settings?.mockService },
     knowledgeCategories: settings?.knowledgeCategories ?? defaultSettings.knowledgeCategories,
     privacyMode: settings?.privacyMode ?? defaultSettings.privacyMode ?? false,
   }
+}
+
+export function isMockServiceConfigured(settings: Settings): boolean {
+  return !!(settings.mockService?.enabled && settings.mockService.serviceUrl?.trim())
 }
 
 export function getDefaultKnowledgeCategory(settings: Settings): { category: string; subcategory: string } {

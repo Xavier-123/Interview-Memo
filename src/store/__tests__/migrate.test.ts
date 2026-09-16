@@ -11,6 +11,7 @@ describe('migratePersistedState', () => {
       'round2',
       'hr',
       'offer',
+      'offer_accepted',
       'closed',
     ])
     expect(JOB_STATUS_LABELS.written_test).toBe('笔试')

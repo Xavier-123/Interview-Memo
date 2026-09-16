@@ -40,6 +40,8 @@ const jobSchema = z
     location: z.string(),
     jobType: z.string(),
     status: z.string(),
+    closeReason: z.string().optional(),
+    closedFromStatus: z.string().optional(),
     priority: z.string(),
     tags: z.array(z.string()).optional(),
     description: z.string().optional(),

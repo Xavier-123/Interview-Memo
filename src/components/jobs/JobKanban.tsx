@@ -26,7 +26,15 @@ import {
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { useAppStore } from '@/store/useAppStore'
 import { formatResumeVersionLabel, getCompanyName, selectJobNextInterview } from '@/store/selectors'
-import { JOB_STATUS_LABELS, JOB_STATUS_META, JOB_STATUS_ORDER, type Job, type JobStatus } from '@/types'
+import { CloseJobDialog } from './CloseJobDialog'
+import {
+  JOB_CLOSE_REASON_LABELS,
+  JOB_STATUS_LABELS,
+  JOB_STATUS_META,
+  JOB_STATUS_ORDER,
+  type Job,
+  type JobStatus,
+} from '@/types'
 import { formatDateTime } from '@/lib/date'
 import { cn } from '@/lib/utils'
 import { UpcomingIndicator, urgencyCardClass } from '@/components/common/UpcomingIndicator'
@@ -120,6 +128,20 @@ function SortableJobCard({ job, companyName, onEdit, onDelete }: JobCardProps) {
             </div>
           )}
           <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+            {job.status === 'closed' && job.closeReason && (
+              <span
+                className={cn(
+                  'inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-medium transition-colors',
+                  job.closeReason === 'offer_declined'
+                    ? 'border border-amber-500/25 bg-amber-500/10 text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-300'
+                    : job.closeReason === 'other'
+                    ? 'border border-zinc-500/25 bg-zinc-500/10 text-zinc-600 dark:border-zinc-500/30 dark:bg-zinc-500/15 dark:text-zinc-400'
+                    : 'border border-rose-500/25 bg-rose-500/10 text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-300',
+                )}
+              >
+                {JOB_CLOSE_REASON_LABELS[job.closeReason]}
+              </span>
+            )}
             <span
               className={cn(
                 'inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-normal transition-colors',
@@ -167,6 +189,7 @@ export function JobKanban({ jobs, onEdit, onDelete, onAdd }: JobKanbanProps) {
   const companies = useAppStore((s) => s.companies)
   const updateJobStatus = useAppStore((s) => s.updateJobStatus)
   const [activeJob, setActiveJob] = useState<Job | null>(null)
+  const [pendingCloseJob, setPendingCloseJob] = useState<Job | null>(null)
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
@@ -191,30 +214,53 @@ export function JobKanban({ jobs, onEdit, onDelete, onAdd }: JobKanbanProps) {
     const jobId = active.id as string
     const current = jobs.find((j) => j.id === jobId)
     if (!current || current.status === targetStatus) return
+
+    if (targetStatus === 'closed') {
+      setPendingCloseJob(current)
+      return
+    }
+
     updateJobStatus(jobId, targetStatus)
     toast.success(`已移动到「${JOB_STATUS_LABELS[targetStatus]}」`)
   }
 
   return (
-    <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-      <ScrollArea className="w-full whitespace-nowrap">
-        <div className="flex gap-4 pb-4">
-          {JOB_STATUS_ORDER.map((status) => (
-            <KanbanColumn
-              key={status}
-              status={status}
-              jobs={jobsByStatus[status]}
-              companies={companies}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              onAdd={() => onAdd(status)}
-            />
-          ))}
-        </div>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
-      <DragOverlay>{activeJob && <JobCardPreview job={activeJob} companyName={getCompanyName(companies, activeJob.companyId)} />}</DragOverlay>
-    </DndContext>
+    <>
+      <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
+        <ScrollArea className="w-full whitespace-nowrap">
+          <div className="flex gap-4 pb-4">
+            {JOB_STATUS_ORDER.map((status) => (
+              <KanbanColumn
+                key={status}
+                status={status}
+                jobs={jobsByStatus[status]}
+                companies={companies}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onAdd={() => onAdd(status)}
+              />
+            ))}
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+        <DragOverlay>{activeJob && <JobCardPreview job={activeJob} companyName={getCompanyName(companies, activeJob.companyId)} />}</DragOverlay>
+      </DndContext>
+
+      <CloseJobDialog
+        open={!!pendingCloseJob}
+        onOpenChange={(open) => {
+          if (!open) setPendingCloseJob(null)
+        }}
+        job={pendingCloseJob}
+        onConfirm={(reason) => {
+          if (pendingCloseJob) {
+            updateJobStatus(pendingCloseJob.id, 'closed', reason)
+            toast.success(`已移动到「已结束 · ${JOB_CLOSE_REASON_LABELS[reason]}」`)
+            setPendingCloseJob(null)
+          }
+        }}
+      />
+    </>
   )
 }
 

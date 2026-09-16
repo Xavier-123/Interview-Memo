@@ -12,6 +12,7 @@ import type {
   ResumeVersion,
   Settings,
 } from '@/types'
+import { JOB_STATUS_ORDER } from '@/types'
 import type { AppState } from './useAppStore'
 import { getDefaultKnowledgeCategory } from '@/lib/settings'
 import { differenceInDays, parseISO } from 'date-fns'
@@ -44,7 +45,7 @@ export function selectKpis(state: AppState): Kpis {
     interviewing: jobs.filter((j) =>
       ['written_test', 'round1', 'round2', 'hr'].includes(j.status),
     ).length,
-    offer: jobs.filter((j) => j.status === 'offer').length,
+    offer: jobs.filter((j) => j.status === 'offer' || j.status === 'offer_accepted').length,
     closed: jobs.filter((j) => j.status === 'closed').length,
   }
 }
@@ -56,17 +57,18 @@ export function selectFunnel(state: AppState): FunnelItem[] {
     round1: '一面',
     round2: '二面',
     hr: 'HR',
-    offer: 'Offer',
+    offer: '已获Offer',
+    offer_accepted: '接受Offer',
     closed: '已结束',
   }
-  const stages: JobStatus[] = ['applied', 'written_test', 'round1', 'round2', 'hr', 'offer']
+  const stages: JobStatus[] = ['applied', 'written_test', 'round1', 'round2', 'hr', 'offer', 'offer_accepted']
+  // 已结束岗位按关闭前的真实阶段累计；旧数据没有该记录时保守地只计入「已投递」
+  const stageIndexOf = (j: Job) =>
+    JOB_STATUS_ORDER.indexOf(j.status === 'closed' ? (j.closedFromStatus ?? 'applied') : j.status)
   return stages.map((stage) => ({
     stage,
     label: labels[stage],
-    count: state.jobs.filter((j) => {
-      const order = ['applied', 'written_test', 'round1', 'round2', 'hr', 'offer', 'closed']
-      return order.indexOf(j.status) >= order.indexOf(stage)
-    }).length,
+    count: state.jobs.filter((j) => stageIndexOf(j) >= JOB_STATUS_ORDER.indexOf(stage)).length,
   }))
 }
 
@@ -152,7 +154,7 @@ export function selectJobNextInterview(state: AppState, jobId: string): Intervie
 }
 
 export function selectCompanyProgress(state: Pick<AppState, 'jobs'>, companyId: string): JobStatus | undefined {
-  const order: JobStatus[] = ['applied', 'written_test', 'round1', 'round2', 'hr', 'offer', 'closed']
+  const order: JobStatus[] = ['applied', 'written_test', 'round1', 'round2', 'hr', 'offer', 'offer_accepted', 'closed']
   const jobs = state.jobs.filter((j) => j.companyId === companyId)
   if (jobs.length === 0) return undefined
   return jobs.reduce((max, j) => (order.indexOf(j.status) > order.indexOf(max) ? j.status : max), 'applied' as JobStatus)

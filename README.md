@@ -139,7 +139,11 @@ npm test          # Vitest 单元测试
 
 ### 模拟面试 `/mock`
 
-两种模式，均调用设置里配置的 OpenAI 兼容大模型 API：
+支持两种运行引擎：
+- **内置引擎（默认）**：零依赖，在浏览器端直接调用你配置的 OpenAI / DeepSeek 兼容接口。
+- **外部多 Agent 服务（可选 Sidecar）**：本地启动独立 Python 服务（见 [`services/mock-agent-service`](services/mock-agent-service/README.md)），具备阶段状态机（破冰 → STAR 项目深挖 → 基础压测 → 反问）与影子观察员动态评估；未启动时自动无缝降级。
+
+两种模拟模式：
 
 | 模式 | 说明 |
 |------|------|

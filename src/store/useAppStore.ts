@@ -21,6 +21,7 @@ import type {
   Interview,
   InterviewRound,
   Job,
+  JobCloseReason,
   JobStatus,
   Knowledge,
   LearningItem,
@@ -75,7 +76,7 @@ export interface AppState {
 
   addJob: (data: Omit<Job, 'id' | 'createdAt' | 'updatedAt'>) => string
   updateJob: (id: string, patch: Partial<Job>) => void
-  updateJobStatus: (id: string, status: JobStatus) => void
+  updateJobStatus: (id: string, status: JobStatus, closeReason?: JobCloseReason) => void
   removeJob: (id: string) => void
 
   addInterview: (
@@ -328,9 +329,14 @@ export const useAppStore = create<AppState>()(
       updateJob: (id, patch) =>
         set((s) => ({ jobs: s.jobs.map((j) => (j.id === id ? { ...j, ...patch, updatedAt: ts() } : j)) })),
 
-      updateJobStatus: (id, status) => {
+      updateJobStatus: (id, status, closeReason) => {
         const job = get().jobs.find((j) => j.id === id)
-        const patch: Partial<Job> = { status }
+        const patch: Partial<Job> = {
+          status,
+          closeReason: status === 'closed' ? closeReason : undefined,
+          // 关闭时记录原阶段（重复关闭保留首次记录），恢复到其他阶段时清除
+          closedFromStatus: status === 'closed' ? (job?.status === 'closed' ? job?.closedFromStatus : job?.status) : undefined,
+        }
         if (status === 'applied' && job && !job.appliedAt) {
           patch.appliedAt = ts()
         }

@@ -11,7 +11,12 @@ import type {
   Review,
   Settings,
 } from '@/types'
-import { DEFAULT_LLM_SETTINGS, DEFAULT_REMINDER_SETTINGS, KNOWLEDGE_CATEGORIES } from '@/types'
+import {
+  DEFAULT_LLM_SETTINGS,
+  DEFAULT_MOCK_SERVICE_SETTINGS,
+  DEFAULT_REMINDER_SETTINGS,
+  KNOWLEDGE_CATEGORIES,
+} from '@/types'
 
 const now = new Date()
 const iso = (offsetDays: number, hour = 14, minute = 0) => {
@@ -28,6 +33,7 @@ export const defaultSettings: Settings = {
   weekStartsOn: 1,
   reminder: { ...DEFAULT_REMINDER_SETTINGS },
   llm: { ...DEFAULT_LLM_SETTINGS },
+  mockService: { ...DEFAULT_MOCK_SERVICE_SETTINGS },
   knowledgeCategories: { ...KNOWLEDGE_CATEGORIES },
   privacyMode: false,
 }

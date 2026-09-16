@@ -1,14 +1,17 @@
-import { JOB_STATUS_LABELS, JOB_STATUS_META } from '@/types'
-import type { JobStatus } from '@/types'
+import { JOB_CLOSE_REASON_LABELS, JOB_STATUS_LABELS, JOB_STATUS_META } from '@/types'
+import type { JobCloseReason, JobStatus } from '@/types'
 import { cn } from '@/lib/utils'
 
 interface JobStatusBadgeProps {
   status: JobStatus
+  closeReason?: JobCloseReason
   className?: string
 }
 
-export function JobStatusBadge({ status, className }: JobStatusBadgeProps) {
+export function JobStatusBadge({ status, closeReason, className }: JobStatusBadgeProps) {
   const meta = JOB_STATUS_META[status]
+  const reasonText = status === 'closed' && closeReason ? ` · ${JOB_CLOSE_REASON_LABELS[closeReason]}` : ''
+
   return (
     <span
       className={cn(
@@ -18,7 +21,7 @@ export function JobStatusBadge({ status, className }: JobStatusBadgeProps) {
       )}
     >
       <span className={cn('h-1.5 w-1.5 rounded-full', meta.dot)} />
-      {JOB_STATUS_LABELS[status]}
+      {JOB_STATUS_LABELS[status]}{reasonText}
     </span>
   )
 }

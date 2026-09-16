@@ -5,7 +5,28 @@ export type JobStatus =
   | 'round2'
   | 'hr'
   | 'offer'
+  | 'offer_accepted'
   | 'closed'
+
+export type JobCloseReason =
+  | 'interview_failed'
+  | 'written_test_failed'
+  | 'offer_declined'
+  | 'other'
+
+export const JOB_CLOSE_REASONS: JobCloseReason[] = [
+  'interview_failed',
+  'written_test_failed',
+  'offer_declined',
+  'other',
+]
+
+export const JOB_CLOSE_REASON_LABELS: Record<JobCloseReason, string> = {
+  interview_failed: '面试失败',
+  written_test_failed: '笔试失败',
+  offer_declined: '拿到offer拒绝',
+  other: '其他 / 主动放弃',
+}
 
 export type InterviewRound = '一面' | '二面' | '三面' | 'HR面' | '加面' | '笔试'
 
@@ -51,6 +72,18 @@ export const DEFAULT_LLM_SETTINGS: LlmSettings = {
   model: 'gpt-4o-mini',
 }
 
+export interface MockServiceSettings {
+  enabled: boolean
+  serviceUrl: string
+  authToken?: string
+}
+
+export const DEFAULT_MOCK_SERVICE_SETTINGS: MockServiceSettings = {
+  enabled: false,
+  serviceUrl: 'http://127.0.0.1:8000',
+  authToken: '',
+}
+
 export const REMINDER_LEAD_OPTIONS: { minutes: number; label: string }[] = [
   { minutes: 1440, label: '1 天前' },
   { minutes: 180, label: '3 小时前' },
@@ -81,6 +114,9 @@ export interface Job {
   location: string
   jobType: JobType
   status: JobStatus
+  closeReason?: JobCloseReason
+  /** 关闭时记录关闭前所在阶段，供漏斗按真实进度累计；仅 closed 状态有值 */
+  closedFromStatus?: JobStatus
   priority: JobPriority
   tags: string[]
   description: string
@@ -163,6 +199,8 @@ export interface Knowledge {
   notes: string
 }
 
+export type MockEngineType = 'builtin' | 'external'
+
 export interface Settings {
   userName: string
   theme: Theme
@@ -170,6 +208,7 @@ export interface Settings {
   weekStartsOn: 0 | 1
   reminder: ReminderSettings
   llm: LlmSettings
+  mockService?: MockServiceSettings
   knowledgeCategories: Record<string, string[]>
   privacyMode?: boolean
 }
@@ -346,6 +385,7 @@ export const JOB_STATUS_ORDER: JobStatus[] = [
   'round2',
   'hr',
   'offer',
+  'offer_accepted',
   'closed',
 ]
 
@@ -355,7 +395,8 @@ export const JOB_STATUS_LABELS: Record<JobStatus, string> = {
   round1: '一面',
   round2: '二面',
   hr: 'HR面',
-  offer: 'Offer',
+  offer: '已获Offer',
+  offer_accepted: '接受Offer',
   closed: '已结束',
 }
 
@@ -383,6 +424,10 @@ export const JOB_STATUS_META: Record<JobStatus, { color: string; dot: string }> 
   offer: {
     color: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30',
     dot: 'bg-emerald-500',
+  },
+  offer_accepted: {
+    color: 'bg-teal-500/15 text-teal-800 border-teal-500/30 dark:bg-teal-500/20 dark:text-teal-200 dark:border-teal-500/40 font-semibold',
+    dot: 'bg-teal-600',
   },
   closed: {
     color: 'bg-zinc-500/10 text-zinc-600 border-zinc-500/20 dark:bg-zinc-500/15 dark:text-zinc-400 dark:border-zinc-500/30',

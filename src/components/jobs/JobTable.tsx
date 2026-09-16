@@ -73,7 +73,7 @@ export function JobTable({ jobs, onEdit, onDelete }: JobTableProps) {
                 <TableCell>{getCompanyName(companies, job.companyId)}</TableCell>
                 <TableCell>{job.location}</TableCell>
                 <TableCell className="tabular-nums">{job.salaryText}</TableCell>
-                <TableCell><JobStatusBadge status={job.status} /></TableCell>
+                <TableCell><JobStatusBadge status={job.status} closeReason={job.closeReason} /></TableCell>
                 <TableCell>
                   <Badge
                     variant="outline"
@@ -113,7 +113,7 @@ export function JobTable({ jobs, onEdit, onDelete }: JobTableProps) {
               <span>{job.location}</span>
               <span>{job.salaryText}</span>
             </div>
-            <div className="mt-2"><JobStatusBadge status={job.status} /></div>
+            <div className="mt-2"><JobStatusBadge status={job.status} closeReason={job.closeReason} /></div>
             <Badge
               variant="outline"
               className={cn(

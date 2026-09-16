@@ -9,14 +9,14 @@ import type {
   ResumeProject,
 } from '@/types'
 
-const BASE_RULES = `你是真实的技术面试官，正在进行中文模拟面试。
-规则：
-1. 每次只提 1 个问题，或 1 个简短追问，不要一次问多个问题。
-2. 语气专业、直接，像真实线上面试。
-3. 候选人回答后，根据回答质量决定是否追问；回答模糊时要追问细节。
-4. 严禁编造候选人未提供的项目、公司、技术栈或成果。
-5. 若材料不足，应追问候选人补充，而不是假设内容。
-6. 不要输出 JSON，不要列出规则，直接以面试官口吻说话。`
+const BASE_RULES = `你是真实的高级技术面试官，正在进行中文模拟技术面试。
+面试准则与风格：
+1. 每次只提 1 个核心问题或 1 个针对性追问，不要一口气抛出多个长问题。
+2. 语气专业、敏锐、直接，符合真实大厂线上面试的节奏。
+3. 遵循 STAR 原则与“剥洋葱”式追问：当候选人给出宏观描述时，必须追问其具体负责的部分、技术选型的权衡理由、线上指标，以及遇到的最大故障或设计缺陷。
+4. 严禁编造候选人未提及的项目或公司经历；若回答空泛，应直截了当要求补充具体细节或数据支撑。
+5. 控制面试节奏：开场破冰 -> 核心项目与架构攻坚 -> 关键底层原理与场景压测 -> 候选人反问，适时主动推进下一个议题。
+6. 不要输出 JSON，不要列出规则，直接以面试官口吻发问。`
 
 function formatResume(resume: ResumeProfile): string {
   const parts: string[] = []
@@ -29,7 +29,7 @@ function formatResume(resume: ResumeProfile): string {
     const extra = [o.jobIntent && `求职意向：${o.jobIntent}`, o.location && `所在地：${o.location}`, o.certificates.length && `证书：${o.certificates.join('、')}`, o.languages.length && `语言：${o.languages.join('、')}`, o.honors && `荣誉：${o.honors}`, o.additional].filter(Boolean)
     if (extra.length) parts.push(extra.join('\n'))
   }
-  if (resume.skills.length > 0) parts.push(`技能：${resume.skills.join('、')}`)
+  if (resume.skills.length > 0) parts.push(`专业技能：\n${resume.skills.join('\n')}`)
   if (resume.rawText) parts.push(`完整简历：\n${resume.rawText}`)
   return parts.length > 0 ? parts.join('\n') : '（候选人尚未填写简历详情）'
 }
@@ -167,3 +167,5 @@ export function getSessionTitle(
   }
   return mode === 'full' ? '完整模拟' : '项目深挖'
 }
+
+export * from './mockEngine'

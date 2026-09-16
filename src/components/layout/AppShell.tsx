@@ -8,12 +8,14 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAppStore } from '@/store/useAppStore'
 import { useInterviewReminders } from '@/hooks/useInterviewReminders'
+import { useImminentInterviewTitle } from '@/hooks/useImminentInterviewTitle'
 import { useEffect } from 'react'
 
 export function AppShell() {
   const hydrated = useAppStore((s) => s.hydrated)
   const location = useLocation()
   useInterviewReminders()
+  useImminentInterviewTitle()
 
   useEffect(() => {
     const timer = setTimeout(() => {

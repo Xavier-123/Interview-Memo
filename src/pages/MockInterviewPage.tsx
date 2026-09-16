@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge'
 import { useAppStore } from '@/store/useAppStore'
 import { resolveJobContext } from '@/store/selectors'
 import { isLlmConfigured } from '@/lib/llm'
+import { isMockServiceConfigured } from '@/lib/settings'
 import { getSessionTitle } from '@/lib/mockInterview'
 import { MOCK_MODE_LABELS, type MockInterviewMode, type ResumeProject } from '@/types'
 import { formatDateTime } from '@/lib/date'
@@ -47,7 +48,9 @@ export function MockInterviewPage() {
   }, [searchParams, setSearchParams])
 
   const llmReady = isLlmConfigured(settings.llm)
-  const canStart = llmReady && (resumeVersions.length > 0 || projects.length > 0)
+  const mockServiceReady = isMockServiceConfigured(settings)
+  const engineReady = llmReady || mockServiceReady
+  const canStart = engineReady && (resumeVersions.length > 0 || projects.length > 0)
 
   const sessions = useMemo(
     () =>
@@ -72,8 +75,8 @@ export function MockInterviewPage() {
   }
 
   const handleStartClick = () => {
-    if (!llmReady) {
-      toast.error('请先在设置中配置大模型 API')
+    if (!engineReady) {
+      toast.error('请先在设置中配置大模型 API 或外部模拟服务')
       navigate('/settings')
       return
     }
@@ -85,19 +88,26 @@ export function MockInterviewPage() {
       <PageHeader
         icon={Bot}
         title="模拟面试"
-        description="完整模拟或项目深挖，调用远程大模型进行多轮对话"
+        description="完整模拟或项目深挖，调用大模型或外部多 Agent 服务进行多轮拟真面试"
         actions={
-          <Button onClick={handleStartClick} disabled={!canStart && llmReady}>
-            <Play className="h-4 w-4" /> 开始模拟
-          </Button>
+          <div className="flex items-center gap-2">
+            {mockServiceReady && (
+              <Badge variant="outline" className="border-primary/30 bg-primary/10 text-primary">
+                外部多 Agent 驱动
+              </Badge>
+            )}
+            <Button onClick={handleStartClick} disabled={!canStart && engineReady}>
+              <Play className="h-4 w-4" /> 开始模拟
+            </Button>
+          </div>
         }
       />
 
-      {!llmReady && (
+      {!engineReady && (
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm">
           <p className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
             <TriangleAlert className="h-4 w-4 shrink-0" />
-            开始模拟前需配置大模型 API。你仍可先上传简历与项目。
+            开始模拟前需配置大模型 API 或外部模拟服务。你仍可先维护简历与项目。
           </p>
           <Button variant="outline" size="sm" onClick={() => navigate('/settings')}>前往设置</Button>
         </div>

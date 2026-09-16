@@ -4,6 +4,7 @@ import { ArrowLeft, Bot, Briefcase, Calendar, Pencil, Plus, Trash2 } from 'lucid
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { StatusBadge } from '@/components/common/StatusBadge'
+import { JobStatusBadge } from '@/components/common/JobStatusBadge'
 import { ErrorState } from '@/components/common/ErrorState'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { JobFormDialog } from '@/components/jobs/JobFormDialog'
@@ -16,7 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAppStore } from '@/store/useAppStore'
 import type { AppState } from '@/store/useAppStore'
 import { formatResumeVersionLabel, resolveJobContext, selectJobInterviews } from '@/store/selectors'
-import { JOB_STATUS_LABELS, type JobPriority } from '@/types'
+import type { JobPriority } from '@/types'
 import { formatDate, formatDateTime } from '@/lib/date'
 
 const priorityLabels: Record<JobPriority, string> = { high: '高', medium: '中', low: '低' }
@@ -96,7 +97,7 @@ export function JobDetailPage() {
             {company.name}
           </Link>
         )}
-        <Badge variant="secondary">{JOB_STATUS_LABELS[job.status]}</Badge>
+        <JobStatusBadge status={job.status} closeReason={job.closeReason} />
         <Badge variant="outline">{job.jobType}</Badge>
         <Badge variant="outline">优先级 {priorityLabels[job.priority]}</Badge>
         <Badge variant={job.resumeVersionId ? 'secondary' : 'destructive'}>{formatResumeVersionLabel(resumeState, job.resumeVersionId)}</Badge>

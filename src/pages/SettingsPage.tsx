@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { BellRing, Database, Settings, ShieldCheck, Sparkles, Tags, TriangleAlert, User } from 'lucide-react'
+import { BellRing, Database, Server, Settings, ShieldCheck, Sparkles, Tags, TriangleAlert, User } from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { TagInput } from '@/components/common/TagInput'
@@ -17,6 +17,7 @@ import { toExportData } from '@/store/selectors'
 import { archiveAllUnlinked } from '@/store/archive'
 import { formatBytes, getPersistedDataSize } from '@/store/persistStorage'
 import { isLlmConfigured, testConnection } from '@/lib/llm'
+import { RemoteMockEngine } from '@/lib/mockEngine'
 import { REMINDER_LEAD_OPTIONS, type Theme } from '@/types'
 
 export function SettingsPage() {
@@ -32,6 +33,8 @@ export function SettingsPage() {
   const [resetOpen, setResetOpen] = useState(false)
   const [clearOpen, setClearOpen] = useState(false)
   const [llmTesting, setLlmTesting] = useState(false)
+  const [mockServiceTesting, setMockServiceTesting] = useState(false)
+  const [mockServiceStatus, setMockServiceStatus] = useState<string | null>(null)
   const [archiving, setArchiving] = useState(false)
 
   const handleExport = () => {
@@ -99,6 +102,31 @@ export function SettingsPage() {
       toast.error(e instanceof Error ? e.message : '连接失败')
     } finally {
       setLlmTesting(false)
+    }
+  }
+
+  const handleTestMockService = async () => {
+    const service = settings.mockService
+    if (!service?.serviceUrl?.trim()) {
+      toast.error('请先填写外部服务地址')
+      return
+    }
+    setMockServiceTesting(true)
+    setMockServiceStatus(null)
+    try {
+      const res = await RemoteMockEngine.checkHealth(service.serviceUrl, service.authToken)
+      if (res.ok) {
+        toast.success(res.message || '外部模拟服务连接成功')
+        setMockServiceStatus(`在线 ${res.version ? `(v${res.version})` : ''}`)
+      } else {
+        toast.error(res.message || '服务异常')
+        setMockServiceStatus('异常')
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : '连接外部服务失败')
+      setMockServiceStatus('连接失败')
+    } finally {
+      setMockServiceTesting(false)
     }
   }
 
@@ -385,6 +413,94 @@ export function SettingsPage() {
               <Button variant="outline" onClick={handleArchiveAll} disabled={archiving}>
                 {archiving ? '归档中...' : '归档历史问题'}
               </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Server className="h-4 w-4 text-primary" />
+              外部模拟面试服务 (Sidecar)
+              {settings.mockService?.enabled && (
+                <Badge variant="outline" className="border-primary/30 bg-primary/10 text-primary">
+                  已启用
+                </Badge>
+              )}
+              {mockServiceStatus && (
+                <Badge
+                  variant="outline"
+                  className={
+                    mockServiceStatus.includes('在线')
+                      ? 'border-success/30 bg-success/10 text-success'
+                      : 'border-destructive/30 bg-destructive/10 text-destructive'
+                  }
+                >
+                  {mockServiceStatus}
+                </Badge>
+              )}
+            </CardTitle>
+            <CardDescription>
+              可选的高阶模式。连接另外独立启动的 Python 多 Agent 适配服务，以获得阶段状态机、STAR 原则深度追问与影子观察员动态评估等更拟真的面试体验。若未启动或异常，系统将自动无缝降级为内置模式。
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="mock-service-enabled"
+                checked={settings.mockService?.enabled ?? false}
+                onCheckedChange={(c) =>
+                  updateSettings({
+                    mockService: {
+                      serviceUrl: settings.mockService?.serviceUrl || 'http://127.0.0.1:8000',
+                      authToken: settings.mockService?.authToken || '',
+                      enabled: !!c,
+                    },
+                  })
+                }
+              />
+              <Label htmlFor="mock-service-enabled">启用外部模拟面试服务</Label>
+            </div>
+            <div className="space-y-2">
+              <Label>服务地址 (Service URL)</Label>
+              <Input
+                placeholder="http://127.0.0.1:8000"
+                value={settings.mockService?.serviceUrl ?? ''}
+                onChange={(e) =>
+                  updateSettings({
+                    mockService: {
+                      enabled: settings.mockService?.enabled ?? false,
+                      authToken: settings.mockService?.authToken ?? '',
+                      serviceUrl: e.target.value,
+                    },
+                  })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Auth Token（可选）</Label>
+              <Input
+                type="password"
+                placeholder="若外部服务配置了鉴权，请填写 Token"
+                value={settings.mockService?.authToken ?? ''}
+                onChange={(e) =>
+                  updateSettings({
+                    mockService: {
+                      enabled: settings.mockService?.enabled ?? false,
+                      serviceUrl: settings.mockService?.serviceUrl || 'http://127.0.0.1:8000',
+                      authToken: e.target.value,
+                    },
+                  })
+                }
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button variant="outline" onClick={handleTestMockService} disabled={mockServiceTesting}>
+                {mockServiceTesting ? '测试中...' : '测试连接'}
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                启动说明见 <code>services/mock-agent-service/README.md</code>
+              </span>
             </div>
           </CardContent>
         </Card>
