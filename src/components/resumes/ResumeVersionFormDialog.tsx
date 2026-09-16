@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { FileUp, Loader2 } from 'lucide-react'
+import { FileUp, Loader2, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -7,147 +7,30 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TagInput } from '@/components/common/TagInput'
+import { DatePicker } from '@/components/ui/date-picker'
 import { useAppStore } from '@/store/useAppStore'
 import { parseResumeFile, RESUME_ACCEPT, type ExtractedResumeProject } from '@/lib/resumeParse'
-import type { ResumeVersion } from '@/types'
+import type { ResumeEducation, ResumeExperience, ResumeExperienceProject, ResumeOtherInfo, ResumeVersion } from '@/types'
 
-interface Props {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  resumeId?: string
-  sourceVersion?: ResumeVersion | null
-  createNewResume?: boolean
-  onCreated?: (resumeId: string) => void
-}
+interface Props { open: boolean; onOpenChange: (open: boolean) => void; resumeId?: string; sourceVersion?: ResumeVersion | null; createNewResume?: boolean; onCreated?: (resumeId: string) => void }
+const education = (): ResumeEducation => ({ startMonth: '', endMonth: '', isCurrent: false, school: '', major: '', degree: '' })
+const project = (): ResumeExperienceProject => ({ title: '', role: '', period: '', techStack: [], description: '', highlights: '', challenges: '' })
+const experience = (): ResumeExperience => ({ company: '', role: '', startMonth: '', endMonth: '', isCurrent: false, description: '', projects: [] })
+const other = (): ResumeOtherInfo => ({ jobIntent: '', location: '', phone: '', email: '', homepage: '', certificates: [], languages: [], honors: '', additional: '' })
 
 export function ResumeVersionFormDialog({ open, onOpenChange, resumeId, sourceVersion, createNewResume, onCreated }: Props) {
-  const projects = useAppStore((s) => s.projects)
-  const settings = useAppStore((s) => s.settings)
-  const createResume = useAppStore((s) => s.createResume)
-  const createResumeVersion = useAppStore((s) => s.createResumeVersion)
-  const addProject = useAppStore((s) => s.addProject)
-  const fileRef = useRef<HTMLInputElement>(null)
-  const [name, setName] = useState('')
-  const [summary, setSummary] = useState('')
-  const [education, setEducation] = useState('')
-  const [skills, setSkills] = useState<string[]>([])
-  const [rawText, setRawText] = useState('')
-  const [fileName, setFileName] = useState('')
-  const [selectedProjectIds, setSelectedProjectIds] = useState<string[]>([])
-  const [extractedProjects, setExtractedProjects] = useState<ExtractedResumeProject[]>([])
-  const [importProjects, setImportProjects] = useState(true)
-  const [parsing, setParsing] = useState(false)
-
-  useEffect(() => {
-    if (!open) return
-    setName(createNewResume ? '' : '')
-    setSummary(sourceVersion?.summary ?? '')
-    setEducation(sourceVersion?.education ?? '')
-    setSkills(sourceVersion?.skills ?? [])
-    setRawText(sourceVersion?.rawText ?? '')
-    setFileName(sourceVersion?.sourceFileName ?? '')
-    setSelectedProjectIds(sourceVersion?.projectSnapshots.map((p) => p.sourceProjectId).filter(Boolean) as string[] ?? [])
-    setExtractedProjects([])
-    setImportProjects(true)
-  }, [open, sourceVersion, createNewResume])
-
-  const handleFile = async (file?: File) => {
-    if (!file) return
-    setParsing(true)
-    try {
-      const parsed = await parseResumeFile(file, settings.llm)
-      setFileName(parsed.sourceFileName)
-      setSummary(parsed.summary)
-      setEducation(parsed.education)
-      setSkills(parsed.skills)
-      setRawText(parsed.rawText)
-      setExtractedProjects(parsed.projects)
-      toast.success(`已解析 ${file.name}`)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : '简历解析失败')
-    } finally {
-      setParsing(false)
-      if (fileRef.current) fileRef.current.value = ''
-    }
-  }
-
-  const toggleProject = (id: string) => {
-    setSelectedProjectIds((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id])
-  }
-
-  const save = () => {
-    if (!rawText.trim()) {
-      toast.error('请先上传或填写简历原文')
-      return
-    }
-    let projectIds = selectedProjectIds
-    if (importProjects && extractedProjects.length > 0) {
-      const existing = new Set(projects.map((p) => p.title.trim().toLowerCase()))
-      const importedIds: string[] = []
-      extractedProjects.forEach((project) => {
-        const key = project.title.trim().toLowerCase()
-        const existingProject = projects.find((item) => item.title.trim().toLowerCase() === key)
-        if (existingProject) {
-          importedIds.push(existingProject.id)
-          return
-        }
-        const id = addProject(project)
-        importedIds.push(id)
-        existing.add(key)
-      })
-      projectIds = Array.from(new Set([...projectIds, ...importedIds]))
-    }
-    const retainedProjectSnapshots = (sourceVersion?.projectSnapshots ?? []).filter(
-      (snapshot) => !snapshot.sourceProjectId || !projects.some((project) => project.id === snapshot.sourceProjectId),
-    )
-    const data = { summary, education, skills, rawText, sourceFileName: fileName, projectIds, retainedProjectSnapshots }
-    if (createNewResume) {
-      if (!name.trim()) {
-        toast.error('请填写简历名称')
-        return
-      }
-      const result = createResume({ ...data, name: name.trim() })
-      onCreated?.(result.resumeId)
-      toast.success('简历已创建（v1）')
-    } else if (resumeId) {
-      const versionId = createResumeVersion(resumeId, data)
-      if (!versionId) {
-        toast.error('无法创建版本：简历可能已归档')
-        return
-      }
-      toast.success('新版本已创建')
-    }
-    onOpenChange(false)
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
-        <DialogHeader><DialogTitle>{createNewResume ? '新建简历' : `基于 v${sourceVersion?.version ?? ''} 新建版本`}</DialogTitle></DialogHeader>
-        <div className="grid gap-4 py-2">
-          {createNewResume && <div className="space-y-2"><Label>简历名称</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="大模型工程版" /></div>}
-          <input ref={fileRef} type="file" accept={RESUME_ACCEPT} className="hidden" onChange={(e) => void handleFile(e.target.files?.[0])} />
-          <Button type="button" variant="outline" disabled={parsing} onClick={() => fileRef.current?.click()}>
-            {parsing ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileUp className="h-4 w-4" />} {parsing ? '正在解析...' : '上传 / 替换简历文件'}
-          </Button>
-          {fileName && <p className="text-xs text-muted-foreground">来源：{fileName}</p>}
-          <div className="space-y-2"><Label>个人摘要</Label><Textarea value={summary} onChange={(e) => setSummary(e.target.value)} rows={3} /></div>
-          <div className="space-y-2"><Label>教育背景</Label><Input value={education} onChange={(e) => setEducation(e.target.value)} /></div>
-          <div className="space-y-2"><Label>技能标签</Label><TagInput tags={skills} onChange={setSkills} placeholder="技能，回车添加" /></div>
-          <div className="space-y-2"><Label>简历原文</Label><Textarea value={rawText} onChange={(e) => setRawText(e.target.value)} rows={10} className="font-mono text-xs" /></div>
-          <div className="space-y-2"><Label>项目快照</Label>
-            {projects.length === 0 ? <p className="text-sm text-muted-foreground">暂无共享项目</p> : projects.map((project) => (
-              <label key={project.id} className="flex items-start gap-2 rounded-md border p-2 text-sm">
-                <Checkbox checked={selectedProjectIds.includes(project.id)} onCheckedChange={() => toggleProject(project.id)} />
-                <span><span className="font-medium">{project.title}</span><span className="block text-xs text-muted-foreground">{project.role} · {project.period}</span></span>
-              </label>
-            ))}
-          </div>
-          {extractedProjects.length > 0 && <label className="flex items-start gap-2 text-sm"><Checkbox checked={importProjects} onCheckedChange={(checked) => setImportProjects(!!checked)} /><span>导入解析出的 {extractedProjects.length} 个项目并冻结到版本</span></label>}
-        </div>
-        <DialogFooter><Button variant="outline" onClick={() => onOpenChange(false)}>取消</Button><Button onClick={save} disabled={parsing}>保存版本</Button></DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
+  const projects = useAppStore((s) => s.projects); const settings = useAppStore((s) => s.settings); const createResume = useAppStore((s) => s.createResume); const createResumeVersion = useAppStore((s) => s.createResumeVersion); const addProject = useAppStore((s) => s.addProject)
+  const fileRef = useRef<HTMLInputElement>(null); const [name, setName] = useState(''); const [summary, setSummary] = useState(''); const [legacyEducation, setLegacyEducation] = useState(''); const [educations, setEducations] = useState<ResumeEducation[]>([]); const [experiences, setExperiences] = useState<ResumeExperience[]>([]); const [otherInfo, setOtherInfo] = useState<ResumeOtherInfo>(other()); const [skills, setSkills] = useState<string[]>([]); const [rawText, setRawText] = useState(''); const [fileName, setFileName] = useState(''); const [selectedProjectIds, setSelectedProjectIds] = useState<string[]>([]); const [extractedProjects, setExtractedProjects] = useState<ExtractedResumeProject[]>([]); const [importProjects, setImportProjects] = useState(true); const [parsing, setParsing] = useState(false)
+  useEffect(() => { if (!open) return; setName(''); setSummary(sourceVersion?.summary ?? ''); setLegacyEducation(sourceVersion?.education ?? ''); setEducations(sourceVersion?.educations?.map((x) => ({ ...x })) ?? []); setExperiences(sourceVersion?.experiences?.map((x) => ({ ...x, projects: x.projects?.map((p) => ({ ...p, techStack: [...p.techStack] })) ?? [] })) ?? []); setOtherInfo({ ...other(), ...(sourceVersion?.otherInfo ?? {}), certificates: [...(sourceVersion?.otherInfo?.certificates ?? [])], languages: [...(sourceVersion?.otherInfo?.languages ?? [])] }); setSkills(sourceVersion?.skills ?? []); setRawText(sourceVersion?.rawText ?? ''); setFileName(sourceVersion?.sourceFileName ?? ''); setSelectedProjectIds(sourceVersion?.projectSnapshots.map((p) => p.sourceProjectId).filter(Boolean) as string[] ?? []); setExtractedProjects([]); setImportProjects(true) }, [open, sourceVersion])
+  const handleFile = async (file?: File) => { if (!file) return; setParsing(true); try { const parsed = await parseResumeFile(file, settings.llm); setFileName(parsed.sourceFileName); setSummary(parsed.summary); setLegacyEducation(parsed.education); setSkills(parsed.skills); setRawText(parsed.rawText); setExtractedProjects(parsed.projects); toast.success(`已解析 ${file.name}`) } catch (e) { toast.error(e instanceof Error ? e.message : '简历解析失败') } finally { setParsing(false); if (fileRef.current) fileRef.current.value = '' } }
+  const patchEducation = (i: number, p: Partial<ResumeEducation>) => setEducations((xs) => xs.map((x, j) => j === i ? { ...x, ...p } : x)); const patchExperience = (i: number, p: Partial<ResumeExperience>) => setExperiences((xs) => xs.map((x, j) => j === i ? { ...x, ...p } : x)); const patchOther = (p: Partial<ResumeOtherInfo>) => setOtherInfo((x) => ({ ...x, ...p })); const patchProject = (ei: number, pi: number, p: Partial<ResumeExperienceProject>) => setExperiences((xs) => xs.map((x, i) => i === ei ? { ...x, projects: x.projects.map((q, j) => j === pi ? { ...q, ...p } : q) } : x))
+  const save = () => { const es = educations.filter((x) => x.school.trim() || x.major.trim() || x.degree.trim() || x.startMonth); const ws = experiences.filter((x) => x.company.trim() || x.role.trim() || x.startMonth); if (createNewResume && !name.trim()) return void toast.error('请填写简历名称'); if (!es.length && !ws.length) return void toast.error('请至少填写一条教育背景或公司经历'); for (const x of es) { if (!x.school.trim() || !x.major.trim() || !(x.degree === '其它' ? x.customDegree?.trim() : x.degree.trim()) || !x.startMonth) return void toast.error('请完整填写教育背景'); if (!x.isCurrent && x.endMonth && x.endMonth < x.startMonth) return void toast.error('教育结束时间不能早于开始时间') }; for (const x of ws) { if (!x.company.trim() || !x.role.trim() || !x.startMonth) return void toast.error('请完整填写公司经历'); if (!x.isCurrent && x.endMonth && x.endMonth < x.startMonth) return void toast.error('工作结束时间不能早于开始时间') }; let ids = selectedProjectIds; if (importProjects) { const imported = extractedProjects.map((p) => projects.find((x) => x.title.trim().toLowerCase() === p.title.trim().toLowerCase())?.id ?? addProject(p)); ids = Array.from(new Set([...ids, ...imported])) }; const snapshots = (sourceVersion?.projectSnapshots ?? []).filter((p) => !p.sourceProjectId || !projects.some((x) => x.id === p.sourceProjectId)); const educationText = es.map((x) => `${x.startMonth} - ${x.isCurrent ? '至今' : x.endMonth} ${x.school} ${x.major} ${x.degree === '其它' ? x.customDegree : x.degree}`).join('\n') || legacyEducation; const data = { summary, education: educationText, educations: es, experiences: ws, otherInfo, skills, rawText, sourceFileName: fileName, projectIds: ids, retainedProjectSnapshots: snapshots }; if (createNewResume) { const r = createResume({ ...data, name: name.trim() }); onCreated?.(r.resumeId); toast.success('简历已创建（v1）') } else if (resumeId) { if (!createResumeVersion(resumeId, data)) return void toast.error('无法创建版本：简历可能已归档'); toast.success('新版本已创建') }; onOpenChange(false) }
+  const date = (value: string, onChange: (v: string) => void, placeholder: string, disabled = false) => <DatePicker value={value} onChange={onChange} placeholder={placeholder} disabled={disabled} />
+  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl"><DialogHeader><DialogTitle>{createNewResume ? '新建简历' : `基于 v${sourceVersion?.version ?? ''} 新建版本`}</DialogTitle></DialogHeader><div className="grid gap-5 py-2">{createNewResume && <div className="space-y-2"><Label>简历名称</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="大模型工程版" /></div>}<div className="rounded-lg border p-4 space-y-2"><Label>个人摘要</Label><Textarea value={summary} onChange={(e) => setSummary(e.target.value)} rows={3} /></div><input ref={fileRef} type="file" accept={RESUME_ACCEPT} className="hidden" onChange={(e) => void handleFile(e.target.files?.[0])} /><Button type="button" variant="outline" disabled={parsing} onClick={() => fileRef.current?.click()}>{parsing ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileUp className="h-4 w-4" />} {parsing ? '正在解析...' : '上传 / 替换简历文件'}</Button>{fileName && <p className="text-xs text-muted-foreground">来源：{fileName}</p>}
+    <section className="space-y-3"><div className="flex justify-between"><h3 className="font-medium">教育背景</h3><Button variant="outline" size="sm" onClick={() => setEducations((x) => [...x, education()])}><Plus className="h-4 w-4" />添加</Button></div>{!educations.length && legacyEducation && <p className="text-sm text-muted-foreground">旧版教育信息：{legacyEducation}</p>}{educations.map((x, i) => <div className="rounded-lg border p-3 space-y-3" key={i}><div className="flex justify-between text-sm">教育经历 {i + 1}<Button variant="ghost" size="icon" onClick={() => setEducations((xs) => xs.filter((_, j) => j !== i))}><Trash2 className="h-4 w-4" /></Button></div><div className="grid gap-2 sm:grid-cols-2">{date(x.startMonth, (v) => patchEducation(i, { startMonth: v }), '选择开始日期')}<div className="flex gap-2">{date(x.endMonth, (v) => patchEducation(i, { endMonth: v }), '选择结束日期', x.isCurrent)}<label className="flex items-center gap-1 text-sm"><Checkbox checked={x.isCurrent} onCheckedChange={(v) => patchEducation(i, { isCurrent: !!v, endMonth: '' })} />至今</label></div><Input placeholder="大学名称" value={x.school} onChange={(e) => patchEducation(i, { school: e.target.value })} /><Input placeholder="专业" value={x.major} onChange={(e) => patchEducation(i, { major: e.target.value })} /><Select value={x.degree} onValueChange={(v) => patchEducation(i, { degree: v })}><SelectTrigger><SelectValue placeholder="学历" /></SelectTrigger><SelectContent>{['中专', '大专', '本科', '硕士', '博士', '其它'].map((d) => <SelectItem value={d} key={d}>{d}</SelectItem>)}</SelectContent></Select>{x.degree === '其它' && <Input placeholder="自定义学历" value={x.customDegree ?? ''} onChange={(e) => patchEducation(i, { customDegree: e.target.value })} />}</div></div>)}</section>
+    <section className="space-y-3"><div className="flex justify-between"><h3 className="font-medium">公司经历 · 项目经历</h3><Button variant="outline" size="sm" onClick={() => setExperiences((x) => [...x, experience()])}><Plus className="h-4 w-4" />添加公司</Button></div>{experiences.map((x, i) => <div className="rounded-lg border p-3 space-y-3" key={i}><div className="flex justify-between text-sm">公司经历 {i + 1}<Button variant="ghost" size="icon" onClick={() => setExperiences((xs) => xs.filter((_, j) => j !== i))}><Trash2 className="h-4 w-4" /></Button></div><div className="grid gap-2 sm:grid-cols-2"><Input placeholder="公司名称" value={x.company} onChange={(e) => patchExperience(i, { company: e.target.value })} /><Input placeholder="职位" value={x.role} onChange={(e) => patchExperience(i, { role: e.target.value })} />{date(x.startMonth, (v) => patchExperience(i, { startMonth: v }), '选择开始日期')}<div className="flex gap-2">{date(x.endMonth, (v) => patchExperience(i, { endMonth: v }), '选择结束日期', x.isCurrent)}<label className="flex items-center gap-1 text-sm"><Checkbox checked={x.isCurrent} onCheckedChange={(v) => patchExperience(i, { isCurrent: !!v, endMonth: '' })} />至今</label></div></div><Textarea placeholder="工作职责与成果" value={x.description} onChange={(e) => patchExperience(i, { description: e.target.value })} /><div className="pl-3 border-l-2 space-y-2"><div className="flex justify-between text-sm">项目经历<Button variant="ghost" size="sm" onClick={() => patchExperience(i, { projects: [...x.projects, project()] })}><Plus className="h-4 w-4" />添加项目</Button></div>{x.projects.map((p, j) => <div className="rounded bg-muted/30 p-2 space-y-2" key={j}><div className="flex gap-2"><Input placeholder="项目名称" value={p.title} onChange={(e) => patchProject(i, j, { title: e.target.value })} /><Input placeholder="项目角色" value={p.role} onChange={(e) => patchProject(i, j, { role: e.target.value })} /><Button variant="ghost" size="icon" onClick={() => patchExperience(i, { projects: x.projects.filter((_, k) => k !== j) })}><Trash2 className="h-4 w-4" /></Button></div><Input placeholder="项目时间段" value={p.period} onChange={(e) => patchProject(i, j, { period: e.target.value })} /><TagInput tags={p.techStack} onChange={(v) => patchProject(i, j, { techStack: v })} placeholder="技术栈，回车添加" /><Textarea placeholder="项目描述" value={p.description} onChange={(e) => patchProject(i, j, { description: e.target.value })} /><Textarea placeholder="亮点与成果" value={p.highlights} onChange={(e) => patchProject(i, j, { highlights: e.target.value })} /></div>)}</div></div>)}</section>
+    <section className="space-y-2"><Label>技能标签</Label><TagInput tags={skills} onChange={setSkills} placeholder="技能，回车添加" /></section><section className="rounded-lg border p-3 space-y-3"><h3 className="font-medium">其它信息</h3><div className="grid gap-2 sm:grid-cols-2">{(['jobIntent', 'location', 'phone', 'email', 'homepage'] as const).map((k) => <Input key={k} placeholder={{ jobIntent: '求职意向', location: '所在地', phone: '手机号', email: '邮箱', homepage: '个人主页 / GitHub' }[k]} value={otherInfo[k]} onChange={(e) => patchOther({ [k]: e.target.value })} />)}</div><TagInput tags={otherInfo.certificates} onChange={(v) => patchOther({ certificates: v })} placeholder="证书，回车添加" /><TagInput tags={otherInfo.languages} onChange={(v) => patchOther({ languages: v })} placeholder="语言能力，回车添加" /><Textarea placeholder="获奖 / 荣誉" value={otherInfo.honors} onChange={(e) => patchOther({ honors: e.target.value })} /><Textarea placeholder="补充说明" value={otherInfo.additional} onChange={(e) => patchOther({ additional: e.target.value })} /></section><details><summary className="cursor-pointer text-sm font-medium">简历原文</summary><Textarea value={rawText} onChange={(e) => setRawText(e.target.value)} rows={8} className="mt-2 font-mono text-xs" /></details>
+  </div><DialogFooter><Button variant="outline" onClick={() => onOpenChange(false)}>取消</Button><Button onClick={save} disabled={parsing}>保存版本</Button></DialogFooter></DialogContent></Dialog>
 }

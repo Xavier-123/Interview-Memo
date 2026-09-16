@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { format, parseISO } from 'date-fns'
 import {
   Dialog,
   DialogContent,
@@ -12,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
+import { DatePicker } from '@/components/ui/date-picker'
 import { useAppStore } from '@/store/useAppStore'
 import type { Interview, InterviewMode, InterviewRound, InterviewStatus } from '@/types'
 import { INTERVIEW_ROUNDS } from '@/types'
@@ -63,7 +65,8 @@ export function InterviewFormDialog({
       if (interview) {
         setJobId(interview.jobId)
         setRound(interview.round)
-        setScheduledAt(interview.scheduledAt.slice(0, 16))
+        // 转为本地时间的 yyyy-MM-ddTHH:mm，避免直接截取 UTC ISO 串导致时间偏移
+        setScheduledAt(format(parseISO(interview.scheduledAt), "yyyy-MM-dd'T'HH:mm"))
         setDuration(String(interview.duration))
         setMode(interview.mode)
         setInterviewer(interview.interviewer)
@@ -154,7 +157,12 @@ export function InterviewFormDialog({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>面试时间</Label>
-              <Input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} />
+              <DatePicker
+                showTime
+                value={scheduledAt}
+                onChange={setScheduledAt}
+                placeholder="选择面试时间"
+              />
             </div>
             <div className="space-y-2">
               <Label>时长（分钟）</Label>

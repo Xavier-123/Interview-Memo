@@ -42,7 +42,7 @@ export function selectKpis(state: AppState): Kpis {
   return {
     applied: jobs.length,
     interviewing: jobs.filter((j) =>
-      ['screening', 'written_test', 'round1', 'round2', 'hr'].includes(j.status),
+      ['written_test', 'round1', 'round2', 'hr'].includes(j.status),
     ).length,
     offer: jobs.filter((j) => j.status === 'offer').length,
     closed: jobs.filter((j) => j.status === 'closed').length,
@@ -52,7 +52,6 @@ export function selectKpis(state: AppState): Kpis {
 export function selectFunnel(state: AppState): FunnelItem[] {
   const labels: Record<JobStatus, string> = {
     applied: '已投递',
-    screening: '简历通过',
     written_test: '笔试',
     round1: '一面',
     round2: '二面',
@@ -60,12 +59,12 @@ export function selectFunnel(state: AppState): FunnelItem[] {
     offer: 'Offer',
     closed: '已结束',
   }
-  const stages: JobStatus[] = ['applied', 'screening', 'written_test', 'round1', 'round2', 'hr', 'offer']
+  const stages: JobStatus[] = ['applied', 'written_test', 'round1', 'round2', 'hr', 'offer']
   return stages.map((stage) => ({
     stage,
     label: labels[stage],
     count: state.jobs.filter((j) => {
-      const order = ['applied', 'screening', 'written_test', 'round1', 'round2', 'hr', 'offer', 'closed']
+      const order = ['applied', 'written_test', 'round1', 'round2', 'hr', 'offer', 'closed']
       return order.indexOf(j.status) >= order.indexOf(stage)
     }).length,
   }))
@@ -153,7 +152,7 @@ export function selectJobNextInterview(state: AppState, jobId: string): Intervie
 }
 
 export function selectCompanyProgress(state: Pick<AppState, 'jobs'>, companyId: string): JobStatus | undefined {
-  const order: JobStatus[] = ['applied', 'screening', 'written_test', 'round1', 'round2', 'hr', 'offer', 'closed']
+  const order: JobStatus[] = ['applied', 'written_test', 'round1', 'round2', 'hr', 'offer', 'closed']
   const jobs = state.jobs.filter((j) => j.companyId === companyId)
   if (jobs.length === 0) return undefined
   return jobs.reduce((max, j) => (order.indexOf(j.status) > order.indexOf(max) ? j.status : max), 'applied' as JobStatus)

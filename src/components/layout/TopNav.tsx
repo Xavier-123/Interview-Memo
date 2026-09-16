@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Menu, Moon, Plus, Search, Sun } from 'lucide-react'
+import { Eye, EyeOff, Menu, Moon, Plus, Search, Sun } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -39,6 +40,8 @@ export function TopNav() {
   const resumes = useAppStore((s) => s.resumes)
   const settings = useAppStore((s) => s.settings)
   const updateSettings = useAppStore((s) => s.updateSettings)
+  const privacyMode = settings.privacyMode ?? false
+  const togglePrivacyMode = () => updateSettings({ privacyMode: !privacyMode })
 
   const searchIndex = useMemo(() => {
     const jobItems = jobs.map((job) => {
@@ -178,6 +181,19 @@ export function TopNav() {
               <DropdownMenuItem onClick={() => navigate('/knowledge?new=1')}>新增题目</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(
+              'rounded-lg transition-colors',
+              privacyMode ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400' : 'text-muted-foreground hover:text-foreground'
+            )}
+            onClick={togglePrivacyMode}
+            title={privacyMode ? '已开启隐私模式 (Alt+P)' : '开启隐私模式 (Alt+P)'}
+            aria-label="切换隐私模式"
+          >
+            {privacyMode ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </Button>
           <Button variant="ghost" size="icon" className="rounded-lg text-muted-foreground hover:text-foreground" onClick={toggleTheme} aria-label="切换主题">
             {resolvedDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>

@@ -29,6 +29,7 @@ export const defaultSettings: Settings = {
   reminder: { ...DEFAULT_REMINDER_SETTINGS },
   llm: { ...DEFAULT_LLM_SETTINGS },
   knowledgeCategories: { ...KNOWLEDGE_CATEGORIES },
+  privacyMode: false,
 }
 
 export const seedCompanies: Company[] = [

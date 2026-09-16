@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { BellRing, Database, Settings, Sparkles, Tags, TriangleAlert, User } from 'lucide-react'
+import { BellRing, Database, Settings, ShieldCheck, Sparkles, Tags, TriangleAlert, User } from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { TagInput } from '@/components/common/TagInput'
@@ -203,6 +203,51 @@ export function SettingsPage() {
                   <SelectItem value="0">周日</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+                <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-primary" />
+                隐私与摸鱼模式 (防偷窥)
+              </CardTitle>
+              <Badge variant={settings.privacyMode ? "default" : "outline"} className={settings.privacyMode ? "bg-amber-500 hover:bg-amber-600" : ""}>
+                {settings.privacyMode ? "已开启" : "未开启"}
+              </Badge>
+            </div>
+            <CardDescription>
+              在办公室或公共场合使用时，自动屏蔽所有求职与面试关键词。快捷键 <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-[11px] font-semibold text-foreground">Alt + P</kbd>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="privacy-mode"
+                checked={settings.privacyMode ?? false}
+                onCheckedChange={(c) => updateSettings({ privacyMode: !!c })}
+              />
+              <Label htmlFor="privacy-mode" className="cursor-pointer font-medium">
+                启用全站关键词脱敏遮蔽
+              </Label>
+            </div>
+            <div className="rounded-lg border bg-muted/40 p-3.5 text-xs text-muted-foreground space-y-2">
+              <div className="font-semibold text-foreground">脱敏替换规则速览：</div>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                <div className="rounded border bg-background/80 px-2 py-1">面试 → <strong className="text-foreground">MS</strong></div>
+                <div className="rounded border bg-background/80 px-2 py-1">简历 → <strong className="text-foreground">JL</strong></div>
+                <div className="rounded border bg-background/80 px-2 py-1">求职 → <strong className="text-foreground">QZ</strong></div>
+                <div className="rounded border bg-background/80 px-2 py-1">岗位 → <strong className="text-foreground">GW</strong></div>
+                <div className="rounded border bg-background/80 px-2 py-1">投递 → <strong className="text-foreground">TD</strong></div>
+                <div className="rounded border bg-background/80 px-2 py-1">薪资 → <strong className="text-foreground">XZ</strong></div>
+                <div className="rounded border bg-background/80 px-2 py-1">笔试 → <strong className="text-foreground">BS</strong></div>
+                <div className="rounded border bg-background/80 px-2 py-1">一面/二面 → <strong className="text-foreground">1M/2M</strong></div>
+              </div>
+              <p className="pt-1 text-[11px] leading-relaxed">
+                同时网页标题会自动伪装为 <code>Dev Memo</code>，防止浏览器标签页露馅。关闭后所有内容无损恢复。
+              </p>
             </div>
           </CardContent>
         </Card>

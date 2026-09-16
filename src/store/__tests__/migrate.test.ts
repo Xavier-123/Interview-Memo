@@ -6,7 +6,6 @@ describe('migratePersistedState', () => {
   it('defines the new job status order and written-test mapping', () => {
     expect(JOB_STATUS_ORDER).toEqual([
       'applied',
-      'screening',
       'written_test',
       'round1',
       'round2',
@@ -38,6 +37,17 @@ describe('migratePersistedState', () => {
         jobs: [{ id: 'j1', status: 'wishlist' }],
       },
       6,
+    )
+    expect(state.jobs[0]?.status).toBe('applied')
+  })
+
+  it('migrates the removed screening status to applied', () => {
+    const state = migratePersistedState(
+      {
+        settings: { userName: 'u', theme: 'light', seeded: true, weekStartsOn: 1 },
+        jobs: [{ id: 'j1', status: 'screening' }],
+      },
+      7,
     )
     expect(state.jobs[0]?.status).toBe('applied')
   })

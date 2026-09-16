@@ -65,6 +65,9 @@ export function MockSessionPage() {
       rawText: version.rawText,
       sourceFileName: version.sourceFileName,
       updatedAt: version.createdAt,
+      educations: version.educations,
+      experiences: version.experiences,
+      otherInfo: version.otherInfo,
     } : resume
   }, [session?.resumeVersionId, resumeVersions, resume])
 

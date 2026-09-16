@@ -92,5 +92,8 @@ export function migratePersistedState(persisted: unknown, version: number): AppS
   if (version < 7) {
     state.jobs = (state.jobs ?? []).map(normalizeJob)
   }
+  if (version < 8) {
+    state.jobs = (state.jobs ?? []).map(normalizeJob)
+  }
   return migrateLegacyResumeData(state) as AppState
 }

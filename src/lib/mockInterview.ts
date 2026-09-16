@@ -21,7 +21,14 @@ const BASE_RULES = `你是真实的技术面试官，正在进行中文模拟面
 function formatResume(resume: ResumeProfile): string {
   const parts: string[] = []
   if (resume.summary) parts.push(`个人摘要：${resume.summary}`)
-  if (resume.education) parts.push(`教育背景：${resume.education}`)
+  if (resume.educations?.length) parts.push(`教育背景：${resume.educations.map((e) => `${e.startMonth} - ${e.isCurrent ? '至今' : e.endMonth}，${e.school}，${e.major}，${e.degree === '其它' ? e.customDegree : e.degree}`).join('；')}`)
+  else if (resume.education) parts.push(`教育背景：${resume.education}`)
+  if (resume.experiences?.length) parts.push(`公司经历：${resume.experiences.map((e) => `${e.company}（${e.role}，${e.startMonth} - ${e.isCurrent ? '至今' : e.endMonth}）：${e.description}${e.projects.length ? ` 项目：${e.projects.map((p) => p.title).join('、')}` : ''}`).join('\n')}`)
+  if (resume.otherInfo) {
+    const o = resume.otherInfo
+    const extra = [o.jobIntent && `求职意向：${o.jobIntent}`, o.location && `所在地：${o.location}`, o.certificates.length && `证书：${o.certificates.join('、')}`, o.languages.length && `语言：${o.languages.join('、')}`, o.honors && `荣誉：${o.honors}`, o.additional].filter(Boolean)
+    if (extra.length) parts.push(extra.join('\n'))
+  }
   if (resume.skills.length > 0) parts.push(`技能：${resume.skills.join('、')}`)
   if (resume.rawText) parts.push(`完整简历：\n${resume.rawText}`)
   return parts.length > 0 ? parts.join('\n') : '（候选人尚未填写简历详情）'

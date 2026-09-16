@@ -34,6 +34,9 @@ import type {
   ResumeProject,
   ResumeProjectSnapshot,
   ResumeVersion,
+  ResumeEducation,
+  ResumeExperience,
+  ResumeOtherInfo,
   Review,
   Settings,
 } from '@/types'
@@ -136,6 +139,9 @@ export interface ResumeVersionInput {
   sourceFileName?: string
   projectIds: string[]
   retainedProjectSnapshots?: ResumeProjectSnapshot[]
+  educations?: ResumeEducation[]
+  experiences?: ResumeExperience[]
+  otherInfo?: ResumeOtherInfo
 }
 
 const ts = () => new Date().toISOString()
@@ -483,6 +489,9 @@ export const useAppStore = create<AppState>()(
               rawText: data.rawText,
               sourceFileName: data.sourceFileName,
               projectSnapshots,
+              educations: data.educations,
+              experiences: data.experiences,
+              otherInfo: data.otherInfo,
               createdAt: t,
             }),
           ],
@@ -521,6 +530,9 @@ export const useAppStore = create<AppState>()(
               rawText: data.rawText,
               sourceFileName: data.sourceFileName,
               projectSnapshots,
+              educations: data.educations,
+              experiences: data.experiences,
+              otherInfo: data.otherInfo,
               createdAt: t,
             }),
           ],
@@ -665,7 +677,7 @@ export const useAppStore = create<AppState>()(
     },
     {
       name: 'interview-memo:v1',
-      version: 7,
+      version: 8,
       migrate: migratePersistedState,
       storage: createJSONStorage(() => persistStorage),
       partialize: (state) => ({

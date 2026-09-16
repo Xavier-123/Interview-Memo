@@ -1,3 +1,4 @@
+import { PrivacyModeProvider } from '@/components/common/PrivacyModeProvider'
 import { Outlet, useLocation } from 'react-router-dom'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { TopNav } from '@/components/layout/TopNav'
@@ -37,7 +38,8 @@ export function AppShell() {
 
   return (
     <TooltipProvider>
-      <div className="flex h-screen overflow-hidden bg-background">
+      <PrivacyModeProvider>
+        <div className="flex h-screen overflow-hidden bg-background">
         <div className="hidden lg:block">
           <Sidebar />
         </div>
@@ -52,6 +54,7 @@ export function AppShell() {
           </main>
         </div>
       </div>
+      </PrivacyModeProvider>
     </TooltipProvider>
   )
 }

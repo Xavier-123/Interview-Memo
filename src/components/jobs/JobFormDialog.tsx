@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { format, parseISO } from 'date-fns'
 import {
   Dialog,
   DialogContent,
@@ -69,7 +70,7 @@ export function JobFormDialog({ open, onOpenChange, job, defaultStatus = 'applie
         setDescription(job.description)
         setJd(job.jd ?? '')
         setSource(job.source ?? '')
-        setAppliedAt(job.appliedAt ? job.appliedAt.slice(0, 10) : '')
+        setAppliedAt(job.appliedAt ? format(parseISO(job.appliedAt), 'yyyy-MM-dd') : '')
         setResumeVersionId(job.resumeVersionId ?? 'none')
       } else {
         setCompanyId(companies[0]?.id ?? '')
@@ -287,7 +288,12 @@ export function JobFormDialog({ open, onOpenChange, job, defaultStatus = 'applie
                 <Label htmlFor="createInterview">同时创建首场面试</Label>
               </div>
               {createInterview && (
-                <Input type="datetime-local" value={interviewDate} onChange={(e) => setInterviewDate(e.target.value)} />
+                <DatePicker
+                  showTime
+                  value={interviewDate}
+                  onChange={setInterviewDate}
+                  placeholder="选择面试时间"
+                />
               )}
             </div>
           )}

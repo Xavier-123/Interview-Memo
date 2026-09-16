@@ -1,6 +1,5 @@
 export type JobStatus =
   | 'applied'
-  | 'screening'
   | 'written_test'
   | 'round1'
   | 'round2'
@@ -172,6 +171,7 @@ export interface Settings {
   reminder: ReminderSettings
   llm: LlmSettings
   knowledgeCategories: Record<string, string[]>
+  privacyMode?: boolean
 }
 
 export interface ResumeProfile {
@@ -181,6 +181,51 @@ export interface ResumeProfile {
   rawText: string
   sourceFileName?: string
   updatedAt: string
+  educations?: ResumeEducation[]
+  experiences?: ResumeExperience[]
+  otherInfo?: ResumeOtherInfo
+}
+
+export interface ResumeEducation {
+  startMonth: string
+  endMonth: string
+  isCurrent: boolean
+  school: string
+  major: string
+  degree: string
+  customDegree?: string
+}
+
+export interface ResumeExperienceProject {
+  title: string
+  role: string
+  period: string
+  techStack: string[]
+  description: string
+  highlights: string
+  challenges: string
+}
+
+export interface ResumeExperience {
+  company: string
+  role: string
+  startMonth: string
+  endMonth: string
+  isCurrent: boolean
+  description: string
+  projects: ResumeExperienceProject[]
+}
+
+export interface ResumeOtherInfo {
+  jobIntent: string
+  location: string
+  phone: string
+  email: string
+  homepage: string
+  certificates: string[]
+  languages: string[]
+  honors: string
+  additional: string
 }
 
 export interface Resume {
@@ -225,6 +270,9 @@ export interface ResumeVersion {
   rawText: string
   sourceFileName?: string
   projectSnapshots: ResumeProjectSnapshot[]
+  educations?: ResumeEducation[]
+  experiences?: ResumeExperience[]
+  otherInfo?: ResumeOtherInfo
   createdAt: string
   archivedAt?: string
 }
@@ -293,7 +341,6 @@ export interface ExportData {
 
 export const JOB_STATUS_ORDER: JobStatus[] = [
   'applied',
-  'screening',
   'written_test',
   'round1',
   'round2',
@@ -304,7 +351,6 @@ export const JOB_STATUS_ORDER: JobStatus[] = [
 
 export const JOB_STATUS_LABELS: Record<JobStatus, string> = {
   applied: '已投递',
-  screening: '简历通过',
   written_test: '笔试',
   round1: '一面',
   round2: '二面',
@@ -317,10 +363,6 @@ export const JOB_STATUS_META: Record<JobStatus, { color: string; dot: string }> 
   applied: {
     color: 'bg-blue-500/10 text-blue-700 border-blue-500/20 dark:bg-blue-500/15 dark:text-blue-300 dark:border-blue-500/30',
     dot: 'bg-blue-500',
-  },
-  screening: {
-    color: 'bg-cyan-500/10 text-cyan-700 border-cyan-500/20 dark:bg-cyan-500/15 dark:text-cyan-300 dark:border-cyan-500/30',
-    dot: 'bg-cyan-500',
   },
   written_test: {
     color: 'bg-sky-500/10 text-sky-700 border-sky-500/20 dark:bg-sky-500/15 dark:text-sky-300 dark:border-sky-500/30',
