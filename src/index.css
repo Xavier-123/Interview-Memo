@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: "Inter", "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+  --font-sans: "Inter Variable", "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
 }
 
 @theme inline {

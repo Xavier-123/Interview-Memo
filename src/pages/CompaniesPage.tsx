@@ -208,7 +208,7 @@ export function CompaniesPage() {
                   <div className="mt-4 flex gap-2">
                     <Button variant="outline" size="sm" asChild><Link to={`/companies/${c.id}`}>详情</Link></Button>
                     <Button variant="outline" size="sm" onClick={() => { setEditing(c); setFormOpen(true) }}>编辑</Button>
-                    <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setDeleteTarget(c)}>删除</Button>
+                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive" onClick={() => setDeleteTarget(c)}>删除</Button>
                   </div>
                 </CardContent>
               </Card>

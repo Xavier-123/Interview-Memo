@@ -79,7 +79,7 @@ export function JobTable({ jobs, onEdit, onDelete }: JobTableProps) {
                     variant="outline"
                     className={cn(
                       'font-normal',
-                      job.resumeVersionId ? 'text-muted-foreground' : 'border-destructive/40 text-destructive',
+                      job.resumeVersionId ? 'text-muted-foreground' : 'border-amber-500/40 text-amber-700 dark:border-amber-500/40 dark:text-amber-400',
                     )}
                   >
                     {formatResumeVersionLabel(resumeState, job.resumeVersionId)}
@@ -118,7 +118,7 @@ export function JobTable({ jobs, onEdit, onDelete }: JobTableProps) {
               variant="outline"
               className={cn(
                 'mt-2 font-normal',
-                job.resumeVersionId ? 'text-muted-foreground' : 'border-destructive/40 text-destructive',
+                job.resumeVersionId ? 'text-muted-foreground' : 'border-amber-500/40 text-amber-700 dark:border-amber-500/40 dark:text-amber-400',
               )}
             >
               {formatResumeVersionLabel(resumeState, job.resumeVersionId)}

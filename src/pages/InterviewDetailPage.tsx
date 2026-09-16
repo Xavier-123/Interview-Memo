@@ -27,6 +27,7 @@ import { MoreHorizontal, Link2, Unlink } from 'lucide-react'
 import { useAppStore } from '@/store/useAppStore'
 import { formatResumeVersionLabel, resolveJobContext } from '@/store/selectors'
 import { formatDateTime } from '@/lib/date'
+import { cn } from '@/lib/utils'
 import type { Question } from '@/types'
 
 export function InterviewDetailPage() {
@@ -92,7 +93,7 @@ export function InterviewDetailPage() {
             <Button variant="outline" size="sm" asChild>
               <Link to={`/interviews/${interview.id}/review`}>去复盘</Link>
             </Button>
-            <Button variant="destructive" size="sm" onClick={() => setDeleteOpen(true)}>删除</Button>
+            <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => setDeleteOpen(true)}>删除</Button>
           </>
         }
       />
@@ -106,7 +107,7 @@ export function InterviewDetailPage() {
           <div><span className="text-muted-foreground">时间：</span>{formatDateTime(interview.scheduledAt)}</div>
           <div><span className="text-muted-foreground">方式：</span>{interview.mode}</div>
           <div><span className="text-muted-foreground">面试官：</span>{interview.interviewer || '—'}</div>
-          <div><span className="text-muted-foreground">投递简历：</span>{interview.jobId ? <Link to={job.resumeVersionId && resumeState.resumeVersions.some((v) => v.id === job.resumeVersionId) ? `/resumes/${resumeState.resumeVersions.find((v) => v.id === job.resumeVersionId)?.resumeId ?? ''}` : '/resumes'} className={job.resumeVersionId && resumeState.resumeVersions.some((v) => v.id === job.resumeVersionId) ? 'text-primary hover:underline' : 'text-destructive'}>{formatResumeVersionLabel(resumeState, job.resumeVersionId)}</Link> : '未关联简历'}</div>
+          <div><span className="text-muted-foreground">投递简历：</span>{interview.jobId ? <Link to={job.resumeVersionId && resumeState.resumeVersions.some((v) => v.id === job.resumeVersionId) ? `/resumes/${resumeState.resumeVersions.find((v) => v.id === job.resumeVersionId)?.resumeId ?? ''}` : '/resumes'} className={job.resumeVersionId && resumeState.resumeVersions.some((v) => v.id === job.resumeVersionId) ? 'text-primary hover:underline' : 'text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300'}>{formatResumeVersionLabel(resumeState, job.resumeVersionId)}</Link> : '未关联简历'}</div>
         </CardContent>
       </Card>
 
@@ -156,7 +157,7 @@ export function InterviewDetailPage() {
                   <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openQuestionForm(q)}>
                     <Pencil className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => { removeQuestion(q.id); toast.success('已删除') }}>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => { removeQuestion(q.id); toast.success('已删除') }}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -169,8 +170,12 @@ export function InterviewDetailPage() {
                 <StarRating value={q.rating} readonly />
                 <div className="flex flex-wrap gap-1">{q.tags.map((t) => <TagChip key={t} tag={t} />)}</div>
                 <Button
-                  variant={q.isWeak ? 'destructive' : 'outline'}
+                  variant="outline"
                   size="sm"
+                  className={cn(
+                    q.isWeak &&
+                      'border-amber-500/40 bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 hover:text-amber-800 dark:border-amber-500/40 dark:bg-amber-500/15 dark:text-amber-400 dark:hover:bg-amber-500/25 dark:hover:text-amber-300',
+                  )}
                   onClick={() => markQuestionWeak(q.id, !q.isWeak)}
                 >
                   {q.isWeak ? '已标记没答好' : '标记没答好'}
@@ -188,11 +193,11 @@ export function InterviewDetailPage() {
       </div>
 
       {weakQuestions.length > 0 && (
-        <Card className="mb-8 border-red-200 bg-red-50/50 dark:border-red-900 dark:bg-red-950/20">
-          <CardHeader><CardTitle className="text-red-700 dark:text-red-400">❌ 没答好的问题</CardTitle></CardHeader>
+        <Card className="mb-8 border-amber-200 bg-amber-50/50 dark:border-amber-900/50 dark:bg-amber-950/20">
+          <CardHeader><CardTitle className="text-amber-700 dark:text-amber-400">⚠️ 没答好的问题</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             {weakQuestions.map((q) => (
-              <div key={q.id} className="rounded-md border border-red-200 bg-background p-4 dark:border-red-900">
+              <div key={q.id} className="rounded-md border border-amber-200 bg-background p-4 dark:border-amber-900/50">
                 <p className="font-medium">Q：{q.question}</p>
                 <p className="mt-2 text-sm"><span className="text-muted-foreground">我的回答：</span>{q.myAnswer}</p>
                 <p className="mt-2 text-sm"><span className="text-muted-foreground">正确理解：</span>{q.idealAnswer}</p>

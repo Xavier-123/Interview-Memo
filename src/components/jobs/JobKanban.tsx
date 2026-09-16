@@ -147,7 +147,7 @@ function SortableJobCard({ job, companyName, onEdit, onDelete }: JobCardProps) {
                 'inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-normal transition-colors',
                 job.resumeVersionId
                   ? 'bg-muted/60 text-muted-foreground'
-                  : 'border border-destructive/25 bg-destructive/10 text-destructive',
+                  : 'border border-amber-500/25 bg-amber-500/10 text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-300',
               )}
             >
               {formatResumeVersionLabel(resumeState, job.resumeVersionId)}

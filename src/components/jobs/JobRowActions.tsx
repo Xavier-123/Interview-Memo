@@ -28,7 +28,7 @@ export function JobRowActions({ job, onEdit, onDelete, compact }: JobRowActionsP
         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(job)}>
           <Pencil className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => onDelete(job)}>
+        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => onDelete(job)}>
           <Trash2 className="h-4 w-4" />
         </Button>
       </div>

@@ -42,6 +42,15 @@ export function InterviewsPage() {
     }
   }, [searchParams, setSearchParams])
 
+  // 支持从总览统计卡等入口带状态过滤跳转（如 /interviews?status=scheduled）
+  useEffect(() => {
+    const status = searchParams.get('status')
+    if (status && status !== 'all') {
+      setStatusFilter(status)
+      setSearchParams({}, { replace: true })
+    }
+  }, [searchParams, setSearchParams])
+
   const enriched = useMemo(() => {
     return baseEnriched
       .filter((i) => {
@@ -124,7 +133,7 @@ export function InterviewsPage() {
                 <p className="mt-1 truncate text-sm text-muted-foreground">
                   {i.job?.title} · {formatDateTime(i.scheduledAt)}
                 </p>
-                <p className={cn('mt-1 text-xs', i.resumeVersion ? 'text-muted-foreground/80' : 'text-destructive')}>
+                <p className={cn('mt-1 text-xs', i.resumeVersion ? 'text-muted-foreground/80' : 'text-amber-600 dark:text-amber-400')}>
                   简历：{formatResumeVersionLabel(resumeState, i.job?.resumeVersionId)}
                 </p>
               </div>

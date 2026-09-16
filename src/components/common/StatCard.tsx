@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import type { LucideIcon } from 'lucide-react'
@@ -42,12 +43,14 @@ interface StatCardProps {
   value: number | string
   icon?: LucideIcon
   tone?: StatTone
+  /** 传入后整卡可点击跳转，悬浮动效才有意义 */
+  to?: string
   className?: string
 }
 
-export function StatCard({ label, value, icon: Icon, tone = 'primary', className }: StatCardProps) {
+export function StatCard({ label, value, icon: Icon, tone = 'primary', to, className }: StatCardProps) {
   const currentTone = TONE_STYLES[tone]
-  return (
+  const card = (
     <Card
       className={cn(
         'group relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:scale-[0.99]',
@@ -58,7 +61,7 @@ export function StatCard({ label, value, icon: Icon, tone = 'primary', className
       <div className={cn('pointer-events-none absolute inset-0 bg-gradient-to-br to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100', currentTone.glow)} />
       <CardContent className="flex items-center justify-between gap-3 p-5">
         <div className="min-w-0">
-          <p className="truncate text-xs font-medium tracking-wide uppercase text-muted-foreground">{label}</p>
+          <p className="truncate text-xs font-medium tracking-wide text-muted-foreground">{label}</p>
           <p className="mt-1 text-3xl font-bold tracking-tight tabular-nums text-foreground">{value}</p>
         </div>
         {Icon && (
@@ -69,5 +72,14 @@ export function StatCard({ label, value, icon: Icon, tone = 'primary', className
       </CardContent>
     </Card>
   )
+
+  if (to) {
+    return (
+      <Link to={to} className="block rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+        {card}
+      </Link>
+    )
+  }
+  return card
 }
 

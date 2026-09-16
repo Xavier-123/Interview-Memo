@@ -84,7 +84,7 @@ export function JobDetailPage() {
             <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
               <Pencil className="h-4 w-4" /> 编辑
             </Button>
-            <Button variant="outline" size="sm" className="text-destructive" onClick={() => setDeleteOpen(true)}>
+            <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => setDeleteOpen(true)}>
               <Trash2 className="h-4 w-4" /> 删除
             </Button>
           </div>

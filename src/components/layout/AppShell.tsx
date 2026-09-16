@@ -50,7 +50,7 @@ export function AppShell() {
           <StorageErrorBanner />
           <ReminderBanner />
           <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-            <div key={location.pathname} className="animate-in fade-in slide-in-from-bottom-1 duration-300">
+            <div key={location.pathname} className="animate-in fade-in slide-in-from-bottom-1 duration-200">
               <Outlet />
             </div>
           </main>

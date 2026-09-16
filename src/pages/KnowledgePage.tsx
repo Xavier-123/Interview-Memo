@@ -232,7 +232,7 @@ export function KnowledgePage() {
                   <button type="button" onClick={() => openEdit(k)} className="min-w-0 flex-1 text-left">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="font-medium">{k.title}</p>
-                      {dueIds.has(k.id) && <Badge variant="destructive">待复习</Badge>}
+                      {dueIds.has(k.id) && <Badge variant="outline" className="border-amber-500/40 text-amber-700 dark:border-amber-500/40 dark:text-amber-400">待复习</Badge>}
                     </div>
                     <p className="text-xs text-muted-foreground">{k.category} / {k.subcategory}</p>
                     <div className="mt-1 flex flex-wrap gap-1">

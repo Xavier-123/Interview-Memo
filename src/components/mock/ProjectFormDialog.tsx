@@ -78,11 +78,11 @@ export function ProjectFormDialog({ open, onOpenChange, project }: ProjectFormDi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-        <DialogHeader>
+      <DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg">
+        <DialogHeader className="shrink-0 border-b px-6 py-4">
           <DialogTitle>{project ? '编辑项目' : '新增项目'}</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-2">
+        <div className="scrollbar-thin grid flex-1 gap-4 overflow-y-auto px-6 py-4">
           <div className="space-y-2">
             <Label>项目名称</Label>
             <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="例如：RAG 问答系统" />
@@ -129,7 +129,7 @@ export function ProjectFormDialog({ open, onOpenChange, project }: ProjectFormDi
             />
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="shrink-0 border-t bg-muted/30 px-6 py-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>取消</Button>
           <Button onClick={save}>保存</Button>
         </DialogFooter>

@@ -87,11 +87,11 @@ export function QuestionFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-        <DialogHeader>
+      <DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg">
+        <DialogHeader className="shrink-0 border-b px-6 py-4">
           <DialogTitle>{question ? '编辑问题' : '添加问题'}</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-2">
+        <div className="scrollbar-thin grid flex-1 gap-4 overflow-y-auto px-6 py-4">
           <div className="space-y-2">
             <Label>问题</Label>
             <Textarea value={form.question} onChange={(e) => setForm({ ...form, question: e.target.value })} />
@@ -117,7 +117,7 @@ export function QuestionFormDialog({
             <TagInput tags={form.tags} onChange={(tags) => setForm({ ...form, tags })} />
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="shrink-0 border-t bg-muted/30 px-6 py-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>取消</Button>
           <Button onClick={() => void save()}>保存</Button>
         </DialogFooter>

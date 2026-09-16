@@ -77,10 +77,10 @@ export function DashboardPage() {
       />
 
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="已投递" value={kpis.applied} icon={Briefcase} tone="primary" />
-        <StatCard label="面试中" value={kpis.interviewing} icon={CalendarClock} tone="info" />
-        <StatCard label="Offer" value={kpis.offer} icon={Trophy} tone="success" />
-        <StatCard label="已结束" value={kpis.closed} icon={XCircle} tone="muted" />
+        <StatCard label="已投递" value={kpis.applied} icon={Briefcase} tone="primary" to="/jobs" />
+        <StatCard label="面试中" value={kpis.interviewing} icon={CalendarClock} tone="info" to="/interviews?status=scheduled" />
+        <StatCard label="Offer" value={kpis.offer} icon={Trophy} tone="success" to="/jobs" />
+        <StatCard label="已结束" value={kpis.closed} icon={XCircle} tone="muted" to="/jobs" />
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
@@ -227,7 +227,7 @@ export function DashboardPage() {
                 学习重点
                 {reviewDueCount > 0 && (
                   <Link to="/knowledge?due=1">
-                    <Badge variant="destructive" className="rounded-full px-2 text-[11px]">待复习 {reviewDueCount}</Badge>
+                    <Badge className="rounded-full bg-warning px-2 text-[11px] text-warning-foreground hover:bg-warning/90">待复习 {reviewDueCount}</Badge>
                   </Link>
                 )}
               </CardTitle>

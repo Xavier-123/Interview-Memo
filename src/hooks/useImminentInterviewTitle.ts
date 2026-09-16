@@ -20,7 +20,8 @@ export function useImminentInterviewTitle() {
   const reviews = useAppStore((s) => s.reviews)
 
   useEffect(() => {
-    if (baseTitle === null) baseTitle = document.title
+    const base = baseTitle ?? document.title
+    baseTitle = base
     const update = () => {
       const upcoming = selectUpcomingInterviews24h({ interviews, jobs, companies, reviews } as AppState)
       const nearest = upcoming[0]
@@ -28,14 +29,14 @@ export function useImminentInterviewTitle() {
       const next =
         nearest && ms > 0 && ms <= IMMINENT_MS
           ? `⏰ ${getCountdownLabel(nearest.scheduledAt)} ${nearest.round} · ${nearest.company?.name ?? ''}`
-          : baseTitle
+          : base
       if (document.title !== next) document.title = next
     }
     update()
     const id = window.setInterval(update, 30_000)
     return () => {
       window.clearInterval(id)
-      if (document.title !== baseTitle) document.title = baseTitle
+      if (document.title !== base) document.title = base
     }
   }, [interviews, jobs, companies, reviews])
 }

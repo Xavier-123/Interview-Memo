@@ -104,11 +104,11 @@ export function ResumeFormDialog({ open, onOpenChange }: ResumeFormDialogProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-        <DialogHeader>
+      <DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg">
+        <DialogHeader className="shrink-0 border-b px-6 py-4">
           <DialogTitle>上传简历</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-2">
+        <div className="scrollbar-thin grid flex-1 gap-4 overflow-y-auto px-6 py-4">
           <input
             ref={fileRef}
             type="file"
@@ -192,7 +192,7 @@ export function ResumeFormDialog({ open, onOpenChange }: ResumeFormDialogProps) 
             </>
           )}
         </div>
-        <DialogFooter>
+        <DialogFooter className="shrink-0 border-t bg-muted/30 px-6 py-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>取消</Button>
           <Button onClick={save} disabled={parsing || !rawText.trim()}>保存</Button>
         </DialogFooter>

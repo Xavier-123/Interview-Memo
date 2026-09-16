@@ -175,11 +175,11 @@ export function JobFormDialog({ open, onOpenChange, job, defaultStatus = 'applie
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-        <DialogHeader>
+      <DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg">
+        <DialogHeader className="shrink-0 border-b px-6 py-4">
           <DialogTitle>{job ? '编辑岗位' : '新增岗位'}</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-2">
+        <div className="scrollbar-thin grid flex-1 gap-4 overflow-y-auto px-6 py-4">
           {!showNewCompany ? (
             <div className="space-y-2">
               <Label>公司</Label>
@@ -327,7 +327,7 @@ export function JobFormDialog({ open, onOpenChange, job, defaultStatus = 'applie
             </div>
           )}
         </div>
-        <DialogFooter>
+        <DialogFooter className="shrink-0 border-t bg-muted/30 px-6 py-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>取消</Button>
           <Button onClick={handleSubmit}>{job ? '保存' : '创建'}</Button>
         </DialogFooter>

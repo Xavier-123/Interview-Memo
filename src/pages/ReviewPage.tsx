@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { CheckCircle2, CircleDashed, NotebookPen } from 'lucide-react'
+import { CheckCircle2, CircleDashed, GraduationCap, NotebookPen } from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { StarRating } from '@/components/common/StarRating'
 import { ErrorState } from '@/components/common/ErrorState'
@@ -17,6 +17,7 @@ import {
   resolveJobContext,
   selectCompletedInterviewsForReview,
   selectReviewForInterview,
+  selectReviewQueue,
 } from '@/store/selectors'
 import { formatDateTime } from '@/lib/date'
 import { JobJdCard } from '@/components/jobs/JobJdCard'
@@ -171,14 +172,43 @@ export function ReviewListPage() {
   const jobs = useAppStore((s) => s.jobs)
   const companies = useAppStore((s) => s.companies)
   const reviews = useAppStore((s) => s.reviews)
+  const knowledge = useAppStore((s) => s.knowledge)
   const items = useMemo(
     () => selectCompletedInterviewsForReview({ interviews, jobs, companies, reviews } as AppState),
     [interviews, jobs, companies, reviews],
   )
+  const dueItems = useMemo(
+    () => selectReviewQueue({ knowledge } as unknown as AppState),
+    [knowledge],
+  )
+  const pendingCount = items.filter((i) => !i.hasReview).length
+  const reviewedCount = items.length - pendingCount
 
   return (
     <div>
       <PageHeader icon={NotebookPen} title="面试复盘" description="结构化复盘，形成学习闭环" />
+
+      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-xs font-medium text-muted-foreground">待复盘</p>
+            <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">{pendingCount}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-xs font-medium text-muted-foreground">已复盘</p>
+            <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">{reviewedCount}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-xs font-medium text-muted-foreground">待复习题目</p>
+            <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">{dueItems.length}</p>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="space-y-2">
         {items.map((i) => (
           <Link
@@ -208,6 +238,39 @@ export function ReviewListPage() {
           </Link>
         ))}
       </div>
+
+      <Card className="mt-8">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <GraduationCap className="h-4 w-4 text-primary" />
+            艾宾浩斯复习队列
+          </CardTitle>
+          <Button variant="ghost" size="sm" className="rounded-lg text-muted-foreground hover:text-foreground" asChild>
+            <Link to="/knowledge?due=1">去复习</Link>
+          </Button>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {dueItems.length === 0 ? (
+            <p className="py-2 text-sm text-muted-foreground">暂无到期待复习的题目，保持节奏 ✨</p>
+          ) : (
+            <>
+              {dueItems.slice(0, 6).map((k) => (
+                <Link
+                  key={k.id}
+                  to={`/knowledge?focus=${k.id}`}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-border/40 bg-muted/20 px-3 py-2 text-sm transition-all hover:border-border hover:bg-accent/40"
+                >
+                  <span className="truncate font-medium text-foreground/90">{k.title}</span>
+                  <span className="shrink-0 text-xs text-muted-foreground">{k.category} / {k.subcategory}</span>
+                </Link>
+              ))}
+              {dueItems.length > 6 && (
+                <p className="text-xs text-muted-foreground">还有 {dueItems.length - 6} 道待复习题目，见题库</p>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

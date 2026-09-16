@@ -297,7 +297,7 @@ export function SettingsPage() {
                     className="max-w-xs"
                     onBlur={(e) => updateCategoryName(cat, e.target.value)}
                   />
-                  <Button variant="ghost" size="sm" className="text-destructive" onClick={() => removeCategory(cat)}>
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive" onClick={() => removeCategory(cat)}>
                     删除
                   </Button>
                 </div>
